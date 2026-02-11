@@ -3,15 +3,10 @@
 import * as React from "react";
 import * as S from "@/components/ui/sidebar";
 import * as Icons from "lucide-react";
-
 import { DatePicker, NavSettings, NavUser } from "./sidebarComponents";
+import { useAuth } from "@/context/authContext";
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navSettings: [
     {
       title: "settings",
@@ -38,10 +33,20 @@ const data = {
 export function AppSidebar({
   ...props
 }: React.ComponentProps<typeof S.Sidebar>) {
+  const { user } = useAuth();
+  const userData = user
+    ? {
+        name: user.firstName,
+        email: user.email || "",
+        avatar: "/avatars/shadcn.jpg",
+        roles: user.roles,
+      }
+    : null;
+
   return (
     <S.Sidebar collapsible="icon" {...props}>
       <S.SidebarHeader>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </S.SidebarHeader>
       <S.SidebarContent>
         <NavSettings items={data.navSettings} />

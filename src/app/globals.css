@@ -141,7 +141,35 @@ body,
 
 @layer components {
 
-    /* Títulos Principales (como el de Login) */
+  /* ===================== */
+  /* Textos semánticos */
+  /* ===================== */
+
+  /* Texto de error (validaciones, mensajes de formulario) */
+  .text-error {
+    @apply text-sm font-medium text-destructive;
+  }
+
+  /* Texto de error más sutil (helper o secondary) */
+  .text-error-muted {
+    @apply text-xs text-destructive/80;
+  }
+
+  /* Texto de éxito (acciones correctas, confirmaciones) */
+  .text-success {
+    @apply text-sm font-medium text-primary;
+  }
+
+  /* Texto de éxito secundario */
+  .text-success-muted {
+    @apply text-xs text-primary/80;
+  }
+}
+
+
+@layer components {
+
+    /* Títulos grandes (como el de Login) */
   .text-h0 {
     @apply text-5xl font-semibold tracking-tight text-foreground sm:text-3xl;
   }

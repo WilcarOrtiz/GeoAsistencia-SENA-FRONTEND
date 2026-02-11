@@ -5,6 +5,8 @@ import { BadgeCheck, ChevronsUpDown, LogOut } from "lucide-react";
 import * as A from "@/components/ui/avatar";
 import * as D from "@/components/ui/dropdown-menu";
 import * as S from "@/components/ui/sidebar";
+import { useRouter } from "next/navigation";
+import { signOut } from "@/actions/auth/auth";
 
 export function NavUser({
   user,
@@ -13,9 +15,19 @@ export function NavUser({
     name: string;
     email: string;
     avatar: string;
-  };
+    roles: string[];
+  } | null;
 }) {
+  const router = useRouter();
   const { isMobile } = S.useSidebar();
+
+  if (!user) return null;
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push("/login");
+  };
+
   return (
     <S.SidebarMenu>
       <S.SidebarMenuItem>
@@ -62,7 +74,7 @@ export function NavUser({
               </D.DropdownMenuItem>
             </D.DropdownMenuGroup>
             <D.DropdownMenuSeparator />
-            <D.DropdownMenuItem>
+            <D.DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </D.DropdownMenuItem>

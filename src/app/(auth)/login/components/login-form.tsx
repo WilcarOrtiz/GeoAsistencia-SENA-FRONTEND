@@ -3,105 +3,107 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { createClient } from "@/utils/supabase/client";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field";
+import * as F from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { login } from "@/actions/auth/auth";
+
+const loginSchema = z.object({
+  email: z.string().email("Correo inválido"),
+  password: z.string().min(6, "Mínimo 6 caracteres"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
 const LoginForm = ({ className, ...props }: React.ComponentProps<"form">) => {
   const router = useRouter();
-  const supabase = createClient();
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+    mode: "onChange",
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = form;
+
+  const onSubmit = async (values: LoginFormValues) => {
     setLoading(true);
+    const result = await login(values);
 
-    const formData = new FormData(event.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      toast.error("Credenciales incorrectas", { position: "top-center" });
+    if (!result.success) {
+      toast.error("Credenciales incorrectas", { description: result.message });
       setLoading(false);
       return;
     }
-
+    toast.success(result.message);
     router.push("/home");
-    router.refresh();
   };
 
   return (
     <form
-      onSubmit={handleLogin}
+      onSubmit={handleSubmit(onSubmit)}
       className={cn("flex flex-col gap-6", className)}
       {...props}
     >
-      <FieldGroup>
+      <F.FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-h1">Login to your account</h1>
+          <h1 className="text-h1">Inicie sesión en su cuenta</h1>
           <p className="text-p text-balance">
-            Enter your email below to login to your account
+            Ingrese su correo electrónico a continuación para iniciar sesión en
+            su cuenta
           </p>
         </div>
 
-        <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
+        <F.Field>
+          <F.FieldLabel htmlFor="email">Email</F.FieldLabel>
           <Input
             id="email"
-            name="email"
             type="email"
-            placeholder="m@example.com"
-            required
+            placeholder="usuario@gmail.com"
+            {...register("email")}
           />
-        </Field>
+          {errors.email && <p className="text-error">{errors.email.message}</p>}
+        </F.Field>
 
-        <Field>
+        <F.Field>
           <div className="flex items-center">
-            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <F.FieldLabel htmlFor="password">Contraseña</F.FieldLabel>
             <Link href="/forgot-password" className="ml-auto text-link">
-              Forgot your password?
+              ¿Olvidaste tu contraseña?
             </Link>
           </div>
-          <Input id="password" name="password" type="password" required />
-        </Field>
+          <Input id="password" type="password" {...register("password")} />
+          {errors.password && (
+            <p className="text-error">{errors.password.message}</p>
+          )}
+        </F.Field>
 
-        <Field>
-          <Button type="submit" disabled={loading}>
+        <F.Field>
+          <Button type="submit" disabled={loading || !isValid}>
             {loading ? "Iniciando sesión..." : "Login"}
           </Button>
-        </Field>
+        </F.Field>
 
-        <FieldSeparator>EduPin</FieldSeparator>
+        <F.FieldSeparator>EduPin</F.FieldSeparator>
 
-        <Field>
-          <FieldDescription className="text-small px-6 text-center">
-            By clicking continue, you agree to our{" "}
-            <a href="#" className="underline">
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a href="#" className="underline">
-              Privacy Policy
-            </a>
-            .
-          </FieldDescription>
-        </Field>
-      </FieldGroup>
+        <F.Field>
+          <F.FieldDescription className="text-small px-6 text-center">
+            aquí va el eslogan
+          </F.FieldDescription>
+        </F.Field>
+      </F.FieldGroup>
     </form>
   );
 };

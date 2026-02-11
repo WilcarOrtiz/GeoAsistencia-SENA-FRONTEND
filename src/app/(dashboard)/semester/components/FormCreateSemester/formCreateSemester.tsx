@@ -47,7 +47,7 @@ export function FormCreateSemester(props: FormCreateSemesterProps) {
 
       console.log("Permisos recibidos:", response.data);
     } catch (error) {
-      console.error("Error al obtener permisos:");
+      console.error("Error al obtener permisos:", error);
     }
     console.log(values);
   };

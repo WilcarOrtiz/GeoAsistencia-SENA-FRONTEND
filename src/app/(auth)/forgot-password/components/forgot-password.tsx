@@ -1,14 +1,7 @@
 "use client";
 
 import { ChevronLeftIcon } from "lucide-react";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import * as C from "@/components/ui/card";
 import AuthBackgroundShape from "../../../../../public/assets/svg/auth-background-shape";
 import Logo from "../../../../../public/assets/svg/logo";
 import Link from "next/link";
@@ -21,20 +14,22 @@ const ForgotPassword = () => {
         <AuthBackgroundShape />
       </div>
 
-      <Card className="z-1 w-full border-none shadow-md sm:max-w-md">
-        <CardHeader className="gap-6">
+      <C.Card className="z-1 w-full border-none shadow-md sm:max-w-md">
+        <C.CardHeader className="gap-6">
           <Logo className="gap-3" />
 
           <div>
-            <CardTitle className="text-h1 mb-2">Forgot Password?</CardTitle>
-            <CardDescription className="text-p">
-              Enter your email and we&apos;ll send you instructions to reset
-              your password
-            </CardDescription>
+            <C.CardTitle className="text-h1 mb-2">
+              ¿Olvidaste tu contraseña?
+            </C.CardTitle>
+            <C.CardDescription className="text-p">
+              Ingrese su correo electrónico y le enviaremos instrucciones para
+              restablecer tu contraseña
+            </C.CardDescription>
           </div>
-        </CardHeader>
+        </C.CardHeader>
 
-        <CardContent className="space-y-4">
+        <C.CardContent className="space-y-4">
           {/* ForgotPassword Form */}
           <ForgotPasswordForm />
           <Link
@@ -42,10 +37,10 @@ const ForgotPassword = () => {
             className="group mx-auto flex w-fit items-center gap-2 "
           >
             <ChevronLeftIcon className="size-5 transition-transform duration-200 group-hover:-translate-x-0.5" />
-            <span>Back to login</span>
+            <span>Volver a iniciar sesión</span>
           </Link>
-        </CardContent>
-      </Card>
+        </C.CardContent>
+      </C.Card>
     </div>
   );
 };

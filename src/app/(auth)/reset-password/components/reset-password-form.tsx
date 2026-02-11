@@ -1,106 +1,136 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import * as F from "@/components/ui/field";
 
-const ResetPasswordForm = () => {
+import { EyeIcon, EyeOffIcon } from "lucide-react";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const resetPasswordSchema = z
+  .object({
+    password: z.string().min(8, "La contraseña debe tener mínimo 8 caracteres"),
+    confirmPassword: z.string().min(8, "Confirma tu contraseña"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
+  });
+
+type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
+
+export default function ResetPasswordForm() {
   const supabase = createClient();
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
-    useState(false);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!password || !confirmPassword)
-      return toast.error("Completa ambos campos");
-    if (password !== confirmPassword)
-      return toast.error("Las contraseñas no coinciden");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm<ResetPasswordFormValues>({
+    resolver: zodResolver(resetPasswordSchema),
+    mode: "onChange",
+  });
+
+  const onSubmit = async (values: ResetPasswordFormValues) => {
     setLoading(true);
 
-    const { error } = await supabase.auth.updateUser({ password });
+    const { error } = await supabase.auth.updateUser({
+      password: values.password,
+    });
 
     if (error) {
       toast.error("Error", {
         description: error.message,
         position: "top-center",
       });
-    } else {
-      toast.success("Contraseña actualizada correctamente", {
-        position: "top-center",
-      });
-      router.push("/login");
+      setLoading(false);
+      return;
     }
 
-    setLoading(false);
+    toast.success("Contraseña actualizada correctamente", {
+      position: "top-center",
+    });
+
+    router.push("/home");
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
-      <div className="w-full space-y-1">
-        <Label htmlFor="password">Nueva Contraseña*</Label>
-        <div className="relative">
-          <Input
-            id="password"
-            type={isPasswordVisible ? "text" : "password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••••••••••"
-            className="pr-9"
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-            className="absolute inset-y-0 right-0"
-          >
-            {isPasswordVisible ? <EyeOffIcon /> : <EyeIcon />}
-          </Button>
-        </div>
-      </div>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+      <F.FieldGroup>
+        {/* PASSWORD */}
+        <F.Field>
+          <F.FieldLabel htmlFor="password">Nueva contraseña</F.FieldLabel>
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              className="pr-9"
+              {...register("password")}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0"
+            >
+              {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+            </Button>
+          </div>
+          {errors.password && (
+            <p className="text-error">{errors.password.message}</p>
+          )}
+        </F.Field>
 
-      <div className="w-full space-y-1">
-        <Label htmlFor="confirmPassword">Confirmar Contraseña*</Label>
-        <div className="relative">
-          <Input
-            id="confirmPassword"
-            type={isConfirmPasswordVisible ? "text" : "password"}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="••••••••••••••••"
-            className="pr-9"
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() =>
-              setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
-            }
-            className="absolute inset-y-0 right-0"
-          >
-            {isConfirmPasswordVisible ? <EyeOffIcon /> : <EyeIcon />}
-          </Button>
-        </div>
-      </div>
+        {/* CONFIRM PASSWORD */}
+        <F.Field>
+          <F.FieldLabel htmlFor="confirmPassword">
+            Confirmar contraseña
+          </F.FieldLabel>
+          <div className="relative">
+            <Input
+              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="••••••••"
+              className="pr-9"
+              {...register("confirmPassword")}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute inset-y-0 right-0"
+            >
+              {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+            </Button>
+          </div>
+          {errors.confirmPassword && (
+            <p className="text-error">{errors.confirmPassword.message}</p>
+          )}
+        </F.Field>
 
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Actualizando..." : "Restablecer Contraseña"}
-      </Button>
+        {/* SUBMIT */}
+        <F.Field>
+          <Button type="submit" disabled={loading || !isValid}>
+            {loading ? "Actualizando..." : "Restablecer contraseña"}
+          </Button>
+        </F.Field>
+      </F.FieldGroup>
     </form>
   );
-};
-
-export default ResetPasswordForm;
+}
