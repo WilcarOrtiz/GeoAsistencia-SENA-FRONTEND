@@ -1,7 +1,8 @@
 import { createClient } from "@/utils/supabase/server";
 import axios from "axios";
+import { createApiHelpers } from "./helper";
 
-export const api = axios.create({
+const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_NEST_API_URL,
 });
 
@@ -17,14 +18,4 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-/*
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      if (typeof window !== "undefined") window.location.href = "/login";
-    }
-    return Promise.reject(error);
-  },
-);
- */
+export const apiServer = createApiHelpers(api);

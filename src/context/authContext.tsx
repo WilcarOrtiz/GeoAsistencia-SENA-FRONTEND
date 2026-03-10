@@ -76,7 +76,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(
     () => ({
-      // Creamos el objeto user "todo en uno"
       user: userProfile
         ? {
             ...userProfile.user,
@@ -89,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       getUserData,
     }),
-    // Agregamos supabaseEmail a las dependencias para que el objeto user se actualice
+
     [userProfile, supabaseEmail, isLoading, getUserData],
   );
 

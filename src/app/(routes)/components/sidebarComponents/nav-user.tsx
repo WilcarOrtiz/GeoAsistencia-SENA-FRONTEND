@@ -21,7 +21,22 @@ export function NavUser({
   const router = useRouter();
   const { isMobile } = S.useSidebar();
 
-  if (!user) return null;
+  // Por esto:
+  if (!user) {
+    return (
+      <S.SidebarMenu>
+        <S.SidebarMenuItem>
+          <S.SidebarMenuButton size="lg" className="animate-pulse">
+            <div className="h-8 w-8 rounded-lg bg-sidebar-accent" />
+            <div className="grid flex-1 gap-1">
+              <div className="h-3 w-20 rounded bg-sidebar-accent" />
+              <div className="h-2 w-32 rounded bg-sidebar-accent" />
+            </div>
+          </S.SidebarMenuButton>
+        </S.SidebarMenuItem>
+      </S.SidebarMenu>
+    );
+  }
 
   const handleLogout = async () => {
     await signOut();

@@ -10,7 +10,9 @@ import * as z from "zod";
 import { FormCreateSemesterProps } from "./FormCreateSemester.type";
 import { DatePickerDemo } from "@/components/shared/datePickerDemo";
 import { SelectDemo } from "@/components/shared/selectDemo";
-import { api } from "@/lib/api";
+import { apiClient } from "@/lib/api/api_client";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const STATUS_OPTIONS = [
   { label: "Activo", value: "activo" },
@@ -27,7 +29,7 @@ const formSchema = z.object({
 
 export function FormCreateSemester(props: FormCreateSemesterProps) {
   const { setOpenModalCreate } = props;
-
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,14 +44,18 @@ export function FormCreateSemester(props: FormCreateSemesterProps) {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      // Llamada al endpoint protegido
-      const response = await api.get("/permissions");
-
-      console.log("Permisos recibidos:", response.data);
+      const res = await apiClient.get("/permissions");
+      if (res.ok) {
+        toast.success(res.message);
+        router.refresh();
+        setOpenModalCreate(false);
+      }
     } catch (error) {
-      console.error("Error al obtener permisos:", error);
+      console.error(error);
+      toast.error("Opps, algo anda mal", {
+        position: "top-center",
+      });
     }
-    console.log(values);
   };
 
   return (

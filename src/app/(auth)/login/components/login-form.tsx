@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { login } from "@/actions/auth/auth";
+import { useAuth } from "@/context/authContext";
 
 const loginSchema = z.object({
   email: z.string().email("Correo inválido"),
@@ -23,6 +24,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const LoginForm = ({ className, ...props }: React.ComponentProps<"form">) => {
+  const { getUserData } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -43,12 +45,16 @@ const LoginForm = ({ className, ...props }: React.ComponentProps<"form">) => {
     const result = await login(values);
 
     if (!result.success) {
-      toast.error("Credenciales incorrectas", { description: result.message });
+      toast.error("Credenciales incorrectas", {
+        description: result.message,
+        position: "top-center",
+      });
       setLoading(false);
       return;
     }
+    await getUserData();
     toast.success(result.message);
-    router.push("/home");
+    router.push("/dashboard");
   };
 
   return (
