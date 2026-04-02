@@ -40,6 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       const profile = await getProfile();
+      console.log("PROFILE >>>", profile); // 👈 AQUI
       setUserProfile(profile ?? null);
     } catch (error) {
       console.error("Error fetching user profile:", error);

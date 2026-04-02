@@ -60,11 +60,21 @@ body,
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  /*--primary: oklch(0.208 0.042 265.755);*/
-  /*--primary-foreground: oklch(0.984 0.003 247.858);*/
+  
+  --primary: oklch(0.208 0.042 265.755);
+  --primary-foreground: oklch(0.984 0.003 247.858);
+  /*AZUL
+    --primary: oklch(0.6 0.18 250);  
+  --primary-foreground: oklch(1 0 0);*/
 
-  --primary: oklch(0.6 0.18 250);   /* color del botón */
-  --primary-foreground: oklch(1 0 0); /* texto blanco */
+  
+  /*verde
+
+    --primary: oklch(0.65 0.2 140); 
+  --primary-foreground: oklch(1 0 0); 
+
+
+  */
 
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
@@ -98,12 +108,22 @@ body,
   --card-foreground: oklch(0.984 0.003 247.858);
   --popover: oklch(0.208 0.042 265.755);
   --popover-foreground: oklch(0.984 0.003 247.858);
+  
+  --primary: oklch(0.929 0.013 255.508);
+  --primary-foreground: oklch(0.208 0.042 265.755);
 
-  /*--primary: oklch(0.929 0.013 255.508);*/
-  /*--primary-foreground: oklch(0.208 0.042 265.755);*/
+  /*
+  AZUL
+  --primary: oklch(0.75 0.15 250);
+  --primary-foreground: oklch(0.15 0.02 260);*/
 
-   --primary: oklch(0.75 0.15 250);
-   --primary-foreground: oklch(0.15 0.02 260);
+
+  /*
+  VERDE
+    --primary: oklch(0.75 0.18 140); 
+  --primary-foreground: oklch(0.1 0.02 140);
+  */
+
 
   --secondary: oklch(0.279 0.041 260.031);
   --secondary-foreground: oklch(0.984 0.003 247.858);
@@ -128,6 +148,19 @@ body,
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+/* global.css o tu archivo de estilos */
+.badge-soft {
+  /* Usamos el color de la variante como texto */
+  color: var(--primary-foreground); 
+  /* Fondo más claro del mismo color */
+  background-color: oklch(from var(--primary) calc(1 - 0.1) 0 0 / 0.15); 
+  /* Redondeo y padding del Badge normal */
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 @layer base {

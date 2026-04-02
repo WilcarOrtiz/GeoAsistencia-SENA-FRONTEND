@@ -14,9 +14,11 @@ import { cn } from "@/lib/utils";
 export function DatePickerDemo({
   value,
   onChange,
+  minDate,
 }: {
   value?: Date;
   onChange: (date?: Date) => void;
+  minDate?: Date;
 }) {
   return (
     <Popover>
@@ -36,8 +38,12 @@ export function DatePickerDemo({
         <Calendar
           mode="single"
           selected={value}
-          onSelect={onChange} // Aquí le pasamos la fecha al formulario
-          disabled={(date) => date < new Date("1900-01-01")}
+          onSelect={onChange}
+          disabled={
+            (date) =>
+              date < new Date("1900-01-01") ||
+              (minDate ? date <= minDate : false) // 👈 deshabilita fechas menores o iguales al startDate
+          }
           initialFocus
         />
       </PopoverContent>

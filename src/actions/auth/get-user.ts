@@ -11,6 +11,8 @@ export const getProfile = async (): Promise<UserProfile | null> => {
       return null;
     }
 
+    console.log(response.data);
+
     return response.data;
   } catch (error) {
     console.log("Error al obtener la informacion del usuario:", error);

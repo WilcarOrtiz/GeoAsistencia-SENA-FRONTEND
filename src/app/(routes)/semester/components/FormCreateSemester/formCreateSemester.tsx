@@ -13,18 +13,19 @@ import { SelectDemo } from "@/components/shared/selectDemo";
 import { apiClient } from "@/lib/api/api_client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import { SEMESTER_STATES, STATE_LABELS } from "@/utils/constants/semester";
 
-const STATUS_OPTIONS = [
-  { label: "Activo", value: "activo" },
-  { label: "Inactivo", value: "inactivo" },
-  { label: "Finalizado", value: "finalizado" },
-];
+const STATUS_OPTIONS = SEMESTER_STATES.map((state) => ({
+  value: state,
+  label: STATE_LABELS[state],
+}));
 
 const formSchema = z.object({
-  name: z.string().min(2).optional(),
+  name: z.string().min(2),
   startDate: z.date(),
   endDate: z.date(),
-  status: z.enum(["activo", "inactivo", "finalizado"]).optional(),
+  state: z.enum(SEMESTER_STATES),
 });
 
 export function FormCreateSemester(props: FormCreateSemesterProps) {
@@ -36,7 +37,7 @@ export function FormCreateSemester(props: FormCreateSemesterProps) {
       name: "",
       startDate: undefined,
       endDate: undefined,
-      status: "activo",
+      state: "active",
     },
   });
 
@@ -44,17 +45,17 @@ export function FormCreateSemester(props: FormCreateSemesterProps) {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const res = await apiClient.get("/permissions");
+      const res = await apiClient.post("/semester", values);
       if (res.ok) {
         toast.success(res.message);
         router.refresh();
         setOpenModalCreate(false);
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Opps, algo anda mal", {
-        position: "top-center",
-      });
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.message ?? "Opps, algo anda mal";
+        toast.error(message, { position: "top-center" });
+      }
     }
   };
 
@@ -108,6 +109,7 @@ export function FormCreateSemester(props: FormCreateSemesterProps) {
                   <DatePickerDemo
                     value={field.value}
                     onChange={field.onChange}
+                    minDate={form.watch("startDate")}
                   />
                 </F.FormControl>
                 <F.FormMessage />
@@ -118,7 +120,7 @@ export function FormCreateSemester(props: FormCreateSemesterProps) {
           <div className="sm:col-span-2">
             <F.FormField
               control={form.control}
-              name="status"
+              name="state"
               render={({ field }) => (
                 <F.FormItem>
                   <F.FormLabel>Estado</F.FormLabel>
