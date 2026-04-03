@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import axios from "axios";
 import { createApiHelpers } from "./helper";
 

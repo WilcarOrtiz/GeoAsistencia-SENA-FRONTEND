@@ -7,14 +7,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { FormCreateSemesterProps } from "./FormCreateSemester.type";
 import { DatePickerDemo } from "@/components/shared/datePickerDemo";
 import { SelectDemo } from "@/components/shared/selectDemo";
 import { apiClient } from "@/lib/api/api_client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { SEMESTER_STATES, STATE_LABELS } from "@/utils/constants/semester";
+import {
+  SEMESTER_STATES,
+  STATE_LABELS,
+} from "@/features/semester/semester.constants";
+import { FormCreateSemesterProps } from "./FormCreateSemester.type";
 
 const STATUS_OPTIONS = SEMESTER_STATES.map((state) => ({
   value: state,

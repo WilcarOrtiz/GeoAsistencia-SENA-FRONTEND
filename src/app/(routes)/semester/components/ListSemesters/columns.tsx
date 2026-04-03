@@ -1,8 +1,11 @@
 "use client";
 import { format } from "date-fns";
-import { Semester, SemesterState } from "@/types/semester.type";
+import { Semester, SemesterState } from "@/features/semester/semester.type";
 import { ColumnDef } from "@tanstack/react-table";
-import { STATE_BADGE_VARIANT, STATE_LABELS } from "@/utils/constants/semester";
+import {
+  STATE_BADGE_VARIANT,
+  STATE_LABELS,
+} from "@/features/semester/semester.constants";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -74,3 +77,5 @@ export const columns: ColumnDef<Semester>[] = [
     },
   },
 ];
+
+//TODO: Agregar lo de button dentro de columna para editar el estado y vista de editar

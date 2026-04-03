@@ -1,7 +1,8 @@
-import * as B from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { AppSidebar } from "./components/app-sidebar";
 import * as S from "@/components/ui/sidebar";
+import { DynamicBreadcrumb } from "./components/DynamicBreadcrumb";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 export default function DashboardLayout({
   children,
@@ -12,17 +13,17 @@ export default function DashboardLayout({
     <S.SidebarProvider>
       <AppSidebar />
       <S.SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 ...">
-          <div className="flex items-center gap-2 px-4">
-            <S.SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <B.Breadcrumb>
-              <B.BreadcrumbList>
-                <B.BreadcrumbItem>
-                  <B.BreadcrumbPage>GeoAsistencia</B.BreadcrumbPage>
-                </B.BreadcrumbItem>
-              </B.BreadcrumbList>
-            </B.Breadcrumb>
+        <header className="flex h-16 shrink-0 items-center gap-2">
+          <div className="flex items-center justify-between w-full px-4">
+            {/* Izquierda */}
+            <div className="flex items-center gap-2">
+              <S.SidebarTrigger className="-ml-1" />
+              <Separator orientation="vertical" className="h-4" />
+              <DynamicBreadcrumb />
+            </div>
+
+            {/* Derecha */}
+            <ThemeToggle />
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>

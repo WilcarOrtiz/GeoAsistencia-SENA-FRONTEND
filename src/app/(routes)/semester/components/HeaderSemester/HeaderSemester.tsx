@@ -12,28 +12,38 @@ import {
 import { CirclePlus } from "lucide-react";
 import { useState } from "react";
 import { FormCreateSemester } from "../FormCreateSemester";
+import { PageHeader } from "@/components/shared/PageHeader";
 
 export function HeaderSemester() {
   const [openModalCreate, setOpenModalCreate] = useState(false);
 
   return (
-    <div>
-      <h1>Lista de semestres</h1>
-      <Dialog open={openModalCreate} onOpenChange={setOpenModalCreate}>
-        <DialogTrigger asChild>
-          <Button>Registrar</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[625px]">
-          <DialogHeader>
-            <DialogTitle>Crear un semestre</DialogTitle>
-            <DialogDescription>
-              Crea y configura un semestre academico
-            </DialogDescription>
-          </DialogHeader>
+    <div className="container mx-auto pt-4">
+      {" "}
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <PageHeader
+          title="Gestión semestres"
+          description="Crea, actualiza y cambia el estado a los semestres académicos"
+        />
+        <Dialog open={openModalCreate} onOpenChange={setOpenModalCreate}>
+          <DialogTrigger asChild>
+            <Button className="flex items-center gap-2">
+              <CirclePlus className="w-5 h-5" />
+              Registrar
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[625px]">
+            <DialogHeader>
+              <DialogTitle>Crear un semestre</DialogTitle>
+              <DialogDescription>
+                Crea y configura un semestre academico
+              </DialogDescription>
+            </DialogHeader>
 
-          <FormCreateSemester setOpenModalCreate={setOpenModalCreate} />
-        </DialogContent>
-      </Dialog>
+            <FormCreateSemester setOpenModalCreate={setOpenModalCreate} />
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }

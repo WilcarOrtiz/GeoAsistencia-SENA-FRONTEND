@@ -36,15 +36,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SEMESTER_STATES, STATE_LABELS } from "@/utils/constants/semester";
+import {
+  SEMESTER_STATES,
+  STATE_LABELS,
+} from "@/features/semester/semester.constants";
+import { Pagination } from "@/components/shared/Pagination";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  total: number; // 👈
-  page: number; // 👈
-  limit: number; // 👈
-  onPageChange: (page: number) => void; // 👈
+  total: number;
+  page: number;
+  limit: number;
+  onPageChange: (page: number) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -190,32 +194,12 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-
-      {/* 👇 Paginacion */}
-      <div className="flex items-center justify-between gap-2 py-4 flex-wrap">
-        <span className="text-sm text-muted-foreground">
-          Página {page} de {totalPages}
-        </span>
-
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPageChange(page - 1)}
-            disabled={page === 1}
-          >
-            Anterior
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPageChange(page + 1)}
-            disabled={page >= totalPages}
-          >
-            Siguiente
-          </Button>
-        </div>
-      </div>
+      {/*  Paginacion */}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+      />
     </div>
   );
 }

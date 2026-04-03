@@ -1,8 +1,8 @@
-import { SEMESTER_STATE } from "@/utils/constants/semester";
+import { SEMESTER_STATE } from "@/features/semester/semester.constants";
 
 export type SemesterState = keyof typeof SEMESTER_STATE;
 
-export type Semester = {
+export interface Semester {
   id: string;
   code: string;
   name: string;
@@ -11,4 +11,4 @@ export type Semester = {
   startDate: string;
   endDate: string;
   state: SemesterState;
-};
+}

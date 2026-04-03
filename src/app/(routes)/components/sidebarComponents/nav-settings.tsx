@@ -4,7 +4,7 @@ import * as C from "@/components/ui/collapsible";
 import * as S from "@/components/ui/sidebar";
 import { NavigationItem } from "@/types/user";
 import { ChevronRight } from "lucide-react";
-import { getIconByName } from "@/lib/icons";
+import { getIconByName } from "@/utils/icons";
 import Link from "next/link";
 
 export function NavSettings({ items }: { items: NavigationItem[] }) {
@@ -17,6 +17,7 @@ export function NavSettings({ items }: { items: NavigationItem[] }) {
       order_index: 1,
       children: [],
     },
+
     {
       id: "7e64143e-c29b-4f55-80d5-0c7a58824771",
       name: "Usuarios",
@@ -91,6 +92,15 @@ export function NavSettings({ items }: { items: NavigationItem[] }) {
           children: [],
         },
       ],
+    },
+
+    {
+      id: "5ff8365a-15f8-49e3-8b5e-7018fd588952",
+      name: "Roles y permisos",
+      route: "/roles",
+      icon: "ShieldUser",
+      order_index: 5,
+      children: [],
     },
   ];
 

@@ -1,33 +1,30 @@
-"use client"; // 👈
+"use client";
 
-import { Semester } from "@/types/semester.type";
+import { Semester } from "@/features/semester/semester.type";
 import { columns } from "./columns";
 import { DataTable } from "./date-table";
 import { apiClient } from "@/lib/api/api_client";
 import { useEffect, useState } from "react";
-
-type PaginatedSemesters = {
-  data: Semester[];
-  total: number;
-  limit: number;
-  page: number;
-};
+import { TableSkeleton } from "@/components/shared/TableSkeleton";
+import { PaginatedData } from "@/types/api";
 
 export default function ListSemesters() {
   const [data, setData] = useState<Semester[]>([]);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1); // 👈
+  const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const limit = 10;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await apiClient.get<PaginatedSemesters>(
+        const { data } = await apiClient.get<PaginatedData<Semester>>(
           `/semester?page=${page}&limit=${limit}`,
         );
-        setData(res.data.data);
-        setTotal(res.data.total);
+
+        console.log(data.data)
+        setData(data.data);
+        setTotal(data.total);
       } catch (error) {
         console.error(error);
       } finally {
@@ -38,8 +35,7 @@ export default function ListSemesters() {
     fetchData();
   }, [page]);
 
-  if (isLoading) return <div>Cargando...</div>;
-
+  if (isLoading) return <TableSkeleton />;
   return (
     <div className="container mx-auto py-10">
       <DataTable

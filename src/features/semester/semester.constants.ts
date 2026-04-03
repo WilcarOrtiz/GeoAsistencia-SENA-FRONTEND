@@ -1,4 +1,4 @@
-import { SemesterState } from "@/types/semester.type";
+import { SemesterState } from "@/features/semester/semester.type";
 
 export const SEMESTER_STATE = {
   planned: { label: "Planeado" },
@@ -15,10 +15,10 @@ export const STATE_BADGE_VARIANT: Record<
   SemesterState,
   "default" | "secondary" | "destructive" | "outline" | "ghost"
 > = {
-  planned: "secondary", // azul/neutral → Planeado
-  active: "default", // gris → Activo
-  finished: "outline", // borde → Finalizado
-  canceled: "destructive", // rojo → Cancelado
+  planned: "secondary",
+  active: "default",
+  finished: "outline",
+  canceled: "destructive",
 };
 export const STATE_LABELS: Record<keyof typeof SEMESTER_STATE, string> =
   Object.fromEntries(

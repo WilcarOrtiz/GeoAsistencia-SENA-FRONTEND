@@ -2,7 +2,7 @@
 
 import { getProfile } from "@/actions/auth/get-user";
 import { UserProfile } from "@/types";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import {
   createContext,
   useContext,

@@ -1,3 +1,7 @@
+import { ROlE_SYSTEM } from "@/features/roleAndPermission/roleAndPermission.constants";
+
+export type roleSystem = keyof typeof ROlE_SYSTEM;
+
 export interface NavigationItem {
   id: string;
   name: string;
@@ -18,7 +22,7 @@ export interface UserProfile {
   };
   roles: {
     id: string;
-    name: string;
+    name: roleSystem;
     description: string;
   }[];
   permissions: string[];
