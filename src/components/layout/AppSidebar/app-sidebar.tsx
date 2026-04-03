@@ -2,7 +2,11 @@
 
 import * as React from "react";
 import * as S from "@/components/ui/sidebar";
-import { DatePicker, NavSettings, NavUser } from "./sidebarComponents";
+import {
+  DatePicker,
+  NavSettings,
+  NavUser,
+} from "./sidebarComponents";
 import { useAuth } from "@/context/authContext";
 
 export function AppSidebar({

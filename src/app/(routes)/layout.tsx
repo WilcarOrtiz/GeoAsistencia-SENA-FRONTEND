@@ -1,7 +1,7 @@
 import { Separator } from "@/components/ui/separator";
-import { AppSidebar } from "./components/app-sidebar";
+import { AppSidebar } from "../../components/layout/AppSidebar/app-sidebar";
 import * as S from "@/components/ui/sidebar";
-import { DynamicBreadcrumb } from "./components/DynamicBreadcrumb";
+import { DynamicBreadcrumb } from "../../components/shared/DynamicBreadcrumb";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 export default function DashboardLayout({

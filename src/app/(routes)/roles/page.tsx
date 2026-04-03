@@ -1,5 +1,5 @@
 import { PageHeader } from "@/components/shared/PageHeader";
-import ListRolesAndPermission from "./components/ListRolesAndPermission/ListRolesAndPermission";
+import ListRolesAndPermission from './components/ListRolesAndPermission/ListRolesAndPermission';
 
 export default function RoleAndPermissionPage() {
   return (

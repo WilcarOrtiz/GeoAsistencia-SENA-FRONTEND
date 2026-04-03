@@ -11,8 +11,8 @@ import {
 
 import { CirclePlus } from "lucide-react";
 import { useState } from "react";
-import { FormCreateSemester } from "../FormCreateSemester";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { FormSemester } from "../FormSemester";
 
 export function HeaderSemester() {
   const [openModalCreate, setOpenModalCreate] = useState(false);
@@ -40,7 +40,7 @@ export function HeaderSemester() {
               </DialogDescription>
             </DialogHeader>
 
-            <FormCreateSemester setOpenModalCreate={setOpenModalCreate} />
+            <FormSemester setOpenModalCreate={setOpenModalCreate} />
           </DialogContent>
         </Dialog>
       </div>

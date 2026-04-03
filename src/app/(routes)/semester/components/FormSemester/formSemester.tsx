@@ -6,18 +6,16 @@ import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-
 import { DatePickerDemo } from "@/components/shared/datePickerDemo";
 import { SelectDemo } from "@/components/shared/selectDemo";
 import { apiClient } from "@/lib/api/api_client";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import axios from "axios";
 import {
   SEMESTER_STATES,
   STATE_LABELS,
 } from "@/features/semester/semester.constants";
-import { FormCreateSemesterProps } from "./FormCreateSemester.type";
+import { FormSemesterProps } from "./FormSemester.type";
 
 const STATUS_OPTIONS = SEMESTER_STATES.map((state) => ({
   value: state,
@@ -31,16 +29,21 @@ const formSchema = z.object({
   state: z.enum(SEMESTER_STATES),
 });
 
-export function FormCreateSemester(props: FormCreateSemesterProps) {
+export function FormSemester(props: FormSemesterProps) {
   const { setOpenModalCreate } = props;
-  const router = useRouter();
+  const isEditing = !!props.semester;
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      startDate: undefined,
-      endDate: undefined,
-      state: "active",
+      name: props.semester?.name ?? "",
+      startDate: props.semester?.startDate
+        ? new Date(props.semester.startDate)
+        : undefined,
+      endDate: props.semester?.endDate
+        ? new Date(props.semester.endDate)
+        : undefined,
+      state: props.semester?.state ?? "active",
     },
   });
 
@@ -48,10 +51,13 @@ export function FormCreateSemester(props: FormCreateSemesterProps) {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const res = await apiClient.post("/semester", values);
+      const res = isEditing
+        ? await apiClient.patch(`/semester/${props.semester!.id}`, values)
+        : await apiClient.post("/semester", values);
+
       if (res.ok) {
         toast.success(res.message);
-        router.refresh();
+        props.onSuccess?.(); // 👈
         setOpenModalCreate(false);
       }
     } catch (error) {
@@ -121,24 +127,26 @@ export function FormCreateSemester(props: FormCreateSemesterProps) {
           />
 
           <div className="sm:col-span-2">
-            <F.FormField
-              control={form.control}
-              name="state"
-              render={({ field }) => (
-                <F.FormItem>
-                  <F.FormLabel>Estado</F.FormLabel>
-                  <F.FormControl>
-                    <SelectDemo
-                      options={STATUS_OPTIONS}
-                      value={field.value}
-                      onChange={field.onChange}
-                      placeholder="Selecciona el estado"
-                    />
-                  </F.FormControl>
-                  <F.FormMessage />
-                </F.FormItem>
-              )}
-            />
+            {!isEditing && (
+              <F.FormField
+                control={form.control}
+                name="state"
+                render={({ field }) => (
+                  <F.FormItem>
+                    <F.FormLabel>Estado</F.FormLabel>
+                    <F.FormControl>
+                      <SelectDemo
+                        options={STATUS_OPTIONS}
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Selecciona el estado"
+                      />
+                    </F.FormControl>
+                    <F.FormMessage />
+                  </F.FormItem>
+                )}
+              />
+            )}
           </div>
         </div>
 

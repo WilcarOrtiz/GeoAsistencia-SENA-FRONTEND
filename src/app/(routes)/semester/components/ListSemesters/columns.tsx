@@ -15,9 +15,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal, Pencil } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, Pencil, RefreshCw } from "lucide-react";
 
-export const columns: ColumnDef<Semester>[] = [
+export const createColumns = (
+  onEdit: (semester: Semester) => void,
+  onChangeState: (semester: Semester) => void,
+): ColumnDef<Semester>[] => [
   { accessorKey: "code", header: "Código" },
   {
     accessorKey: "name",
@@ -58,6 +61,8 @@ export const columns: ColumnDef<Semester>[] = [
     id: "actions",
     cell: ({ row }) => {
       const semester = row.original;
+      const isLocked = ["finished", "canceled"].includes(semester.state);
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -66,10 +71,17 @@ export const columns: ColumnDef<Semester>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => console.log(semester.id)}>
+            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => onEdit(semester)}
+              disabled={isLocked}
+            >
               <Pencil className="mr-2 h-4 w-4" />
               Editar
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onChangeState(semester)}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Cambiar estado
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -77,5 +89,3 @@ export const columns: ColumnDef<Semester>[] = [
     },
   },
 ];
-
-//TODO: Agregar lo de button dentro de columna para editar el estado y vista de editar

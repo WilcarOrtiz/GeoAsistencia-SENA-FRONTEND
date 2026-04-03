@@ -116,7 +116,6 @@ export function DataTable<TData, TValue>({
         </Select>
 
         {/* Button de que columnas mostrar*/}
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -194,6 +193,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+
       {/*  Paginacion */}
       <Pagination
         page={page}
