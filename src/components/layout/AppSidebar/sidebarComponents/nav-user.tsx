@@ -1,11 +1,11 @@
 "use client";
 
 import { BadgeCheck, ChevronsUpDown, LogOut } from "lucide-react";
-import * as A from "@/components/ui/avatar";
 import * as D from "@/components/ui/dropdown-menu";
 import * as S from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
 import { signOut } from "@/actions/auth/auth";
+import { UserAvatar } from "@/components/shared/UserAvatar";
 
 export function NavUser({
   user,
@@ -18,14 +18,6 @@ export function NavUser({
   console.log("NavUser recibe:", user);
   const router = useRouter();
   const { isMobile } = S.useSidebar();
-
-  const UserAvatar = () => (
-    <A.Avatar className="h-8 w-8 rounded-lg">
-      <A.AvatarFallback className="rounded-lg">
-        {user?.name?.[0] ?? "?"}
-      </A.AvatarFallback>
-    </A.Avatar>
-  );
 
   if (!user) {
     return (
@@ -58,7 +50,7 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <UserAvatar />
+              <UserAvatar name={user.name} />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
                 <span className="truncate text-xs">{user.email}</span>
@@ -76,7 +68,7 @@ export function NavUser({
           >
             <D.DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <UserAvatar />
+                <UserAvatar name={user.name} />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
                   <span className="truncate text-xs">{user.email}</span>

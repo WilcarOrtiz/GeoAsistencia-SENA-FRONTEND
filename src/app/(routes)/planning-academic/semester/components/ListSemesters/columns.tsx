@@ -7,19 +7,14 @@ import {
   STATE_LABELS,
 } from "@/features/semester/semester.constants";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import * as D from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal, Pencil, RefreshCw } from "lucide-react";
+import * as I from "lucide-react";
 
 export const createColumns = (
   onEdit: (semester: Semester) => void,
   onChangeState: (semester: Semester) => void,
+  onDelete: (id: string) => void,
 ): ColumnDef<Semester>[] => [
   { accessorKey: "code", header: "Código" },
   {
@@ -30,7 +25,7 @@ export const createColumns = (
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
         Nombre
-        <ArrowUpDown className="w-4 m-4 ml-2" />
+        <I.ArrowUpDown className="w-4 m-4 ml-2" />
       </Button>
     ),
   },
@@ -64,27 +59,38 @@ export const createColumns = (
       const isLocked = ["finished", "canceled"].includes(semester.state);
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => onEdit(semester)}
-              disabled={isLocked}
-            >
-              <Pencil className="mr-2 h-4 w-4" />
-              Editar
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onChangeState(semester)}>
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Cambiar estado
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-destructive hover:text-destructive"
+            onClick={() => onDelete(semester.id)}
+          >
+            <I.Trash2 className="h-4 w-4" />
+          </Button>
+
+          <D.DropdownMenu>
+            <D.DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <I.MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </D.DropdownMenuTrigger>
+            <D.DropdownMenuContent align="end">
+              <D.DropdownMenuLabel>Acciones</D.DropdownMenuLabel>
+              <D.DropdownMenuItem
+                onClick={() => onEdit(semester)}
+                disabled={isLocked}
+              >
+                <I.Pencil className="mr-2 h-4 w-4" />
+                Editar
+              </D.DropdownMenuItem>
+              <D.DropdownMenuItem onClick={() => onChangeState(semester)}>
+                <I.RefreshCw className="mr-2 h-4 w-4" />
+                Cambiar estado
+              </D.DropdownMenuItem>
+            </D.DropdownMenuContent>
+          </D.DropdownMenu>
+        </div>
       );
     },
   },

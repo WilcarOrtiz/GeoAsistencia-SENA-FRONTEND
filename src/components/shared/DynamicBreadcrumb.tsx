@@ -7,9 +7,12 @@ const LABELS: Record<string, string> = {
   dashboard: "Dashboard",
   roles: "Roles",
   semesters: "Semestres",
+  semester: "Semestre",
   students: "Estudiantes",
+  subject: "Asignaturas",
   edit: "Editar",
   create: "Crear",
+  "planning-academic": "Planeación Académica",
 };
 
 function isId(segment: string) {

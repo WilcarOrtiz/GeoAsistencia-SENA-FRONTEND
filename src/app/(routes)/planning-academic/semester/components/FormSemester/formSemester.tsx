@@ -57,7 +57,7 @@ export function FormSemester(props: FormSemesterProps) {
 
       if (res.ok) {
         toast.success(res.message);
-        props.onSuccess?.(); // 👈
+        props.onSuccess?.();
         setOpenModalCreate(false);
       }
     } catch (error) {

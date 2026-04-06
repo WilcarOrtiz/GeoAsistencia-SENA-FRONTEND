@@ -4,7 +4,7 @@ import { Semester } from "@/features/semester/semester.type";
 import { createColumns } from "./columns";
 import { DataTable } from "./date-table";
 import { apiClient } from "@/lib/api/api_client";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
 import { PaginatedData } from "@/types/api";
 import {
@@ -16,12 +16,16 @@ import {
 
 import { FormChangeState } from "../FormChangeState/FormChangeState";
 import { FormSemester } from "../FormSemester";
+import { AlertDialogDestructive } from "@/components/shared/AlertDialogDestructive";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 export default function ListSemesters() {
   const [data, setData] = useState<Semester[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [semesterToDelete, setSemesterToDelete] = useState<string | null>(null);
   const limit = 10;
 
   // Modal edición
@@ -36,22 +40,7 @@ export default function ListSemesters() {
     Semester | undefined
   >();
 
-  const handleEdit = (semester: Semester) => {
-    setSelectedSemester(semester);
-    setOpenEdit(true);
-  };
-
-  const handleChangeState = (semester: Semester) => {
-    setSemesterForState(semester);
-    setOpenState(true);
-  };
-
-  const columns = useMemo(
-    () => createColumns(handleEdit, handleChangeState),
-    [],
-  );
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const { data } = await apiClient.get<PaginatedData<Semester>>(
         `/semester?page=${page}&limit=${limit}`,
@@ -60,30 +49,51 @@ export default function ListSemesters() {
       setTotal(data.total);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [page]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleEdit = useCallback((semester: Semester) => {
+    setSelectedSemester(semester);
+    setOpenEdit(true);
+  }, []);
+
+  const handleChangeState = useCallback((semester: Semester) => {
+    setSemesterForState(semester);
+    setOpenState(true);
+  }, []);
+
+  const handleDelete = async () => {
+    if (!semesterToDelete) return;
+    try {
+      const res = await apiClient.delete(`/semester/${semesterToDelete}`);
+      setSemesterToDelete(null);
+
+      toast.success("Acción Realizada", {
+        description: res.message,
+        position: "top-center",
+      });
+
+      fetchData();
+    } catch (error) {
+      setSemesterToDelete(null);
+      if (error instanceof AxiosError) {
+        toast.error(
+          error.response?.data?.message ?? "No se pudo eliminar el semestre",
+        );
+      }
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [page]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data } = await apiClient.get<PaginatedData<Semester>>(
-          `/semester?page=${page}&limit=${limit}`,
-        );
-        setData(data.data);
-        setTotal(data.total);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [page]);
+  const columns = useMemo(
+    () => createColumns(handleEdit, handleChangeState, setSemesterToDelete),
+    [handleEdit, handleChangeState],
+  );
 
   if (isLoading) return <TableSkeleton />;
 
@@ -98,7 +108,7 @@ export default function ListSemesters() {
         onPageChange={setPage}
       />
 
-      {/* Modal editar info general */}
+      {/* Modal editar */}
       <Dialog open={openEdit} onOpenChange={setOpenEdit}>
         <DialogContent>
           <DialogHeader>
@@ -129,6 +139,16 @@ export default function ListSemesters() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Modal eliminar */}
+
+      <AlertDialogDestructive
+        open={!!semesterToDelete}
+        onOpenChange={() => setSemesterToDelete(null)}
+        onConfirm={handleDelete}
+        title="¿Eliminar semestre?"
+        description="Ten en cuenta que esta acción no se puede deshacer, así que verifica antes de continuar."
+      />
     </div>
   );
 }
