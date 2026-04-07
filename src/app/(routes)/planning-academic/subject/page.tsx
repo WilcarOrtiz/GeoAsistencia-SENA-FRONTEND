@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import { HeaderSemester } from "./components/HeaderSemester/HeaderSemester";
-import { createColumns } from "./components/ListSemesters/columns";
-import { DataTable } from "./components/ListSemesters/DataTable";
+
+import { createColumns } from "./components/ListSubject/columns";
+import { DataTable } from "./components/ListSubject/DataTable";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
 import {
   Dialog,
@@ -12,14 +12,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FormChangeState } from "./components/FormChangeState/FormChangeState";
-import { FormSemester } from "./components/FormSemester";
-import { AlertDialogDestructive } from "@/components/shared/AlertDialogDestructive";
-import { useSemesters } from "./hooks/useSemesters";
 
-export default function SemesterPage() {
+import { AlertDialogDestructive } from "@/components/shared/AlertDialogDestructive";
+
+import { FormSubject } from "./components/FormSubject";
+import { HeaderSubject } from "./components/HeaderSubject/HeaderSubject";
+import { useSubjects } from "./hooks";
+
+export default function SubjectPage() {
   const {
-    semesters,
+    subjects,
     total,
     isLoading,
     page,
@@ -30,13 +32,12 @@ export default function SemesterPage() {
     closeModal,
     handleDelete,
     refreshData,
-  } = useSemesters();
+  } = useSubjects();
 
   const columns = useMemo(
     () =>
       createColumns(
-        (semester) => openModal("edit", semester),
-        (semester) => openModal("changeState", semester),
+        (subject) => openModal("edit", subject),
         (id) => openModal("delete", { id } as never),
       ),
     [openModal],
@@ -44,7 +45,7 @@ export default function SemesterPage() {
 
   return (
     <div>
-      <HeaderSemester onCreateClick={() => openModal("create")} />
+      <HeaderSubject onCreateClick={() => openModal("create")} />
 
       <div className="container mx-auto py-10">
         {isLoading ? (
@@ -52,7 +53,7 @@ export default function SemesterPage() {
         ) : (
           <DataTable
             columns={columns}
-            data={semesters}
+            data={subjects}
             total={total}
             page={page}
             limit={limit}
@@ -69,38 +70,21 @@ export default function SemesterPage() {
         <DialogContent className="sm:max-w-[625px]">
           <DialogHeader>
             <DialogTitle>
-              {modal.type === "edit" ? "Editar Semestre" : "Crear un semestre"}
+              {modal.type === "edit"
+                ? "Editar materia"
+                : "Registrar una materia"}
             </DialogTitle>
             {modal.type === "create" && (
               <DialogDescription>
-                Crea y configura un semestre academico
+                Crea y configura una nueva materia academica
               </DialogDescription>
             )}
           </DialogHeader>
-          <FormSemester
-            semester={modal.semester}
+          <FormSubject
+            subject={modal.subject}
             onSuccess={refreshData}
             onClose={closeModal}
           />
-        </DialogContent>
-      </Dialog>
-
-      {/* Modal Cambiar Estado */}
-      <Dialog
-        open={modal.type === "changeState"}
-        onOpenChange={(open) => !open && closeModal()}
-      >
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Cambiar Estado</DialogTitle>
-          </DialogHeader>
-          {modal.semester && (
-            <FormChangeState
-              semester={modal.semester}
-              onSuccess={refreshData}
-              onClose={closeModal}
-            />
-          )}
         </DialogContent>
       </Dialog>
 
@@ -109,7 +93,7 @@ export default function SemesterPage() {
         open={modal.type === "delete"}
         onOpenChange={closeModal}
         onConfirm={handleDelete}
-        title="Eliminar semestre?"
+        title="Eliminar asignatura?"
         description="Ten en cuenta que esta accion no se puede deshacer, asi que verifica antes de continuar."
       />
     </div>

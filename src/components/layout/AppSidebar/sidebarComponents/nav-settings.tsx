@@ -43,6 +43,15 @@ export function NavSettings({ items }: { items: NavigationItem[] }) {
       order_index: 5,
       children: [],
     },
+
+    {
+      id: "5ff8365a-15f8-49e3-8b5e-7018fd588952",
+      name: "Gestion de usuario",
+      route: "/users",
+      icon: "UserCog",
+      order_index: 5,
+      children: [],
+    },
   ];
 
   return (

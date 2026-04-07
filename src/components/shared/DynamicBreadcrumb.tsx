@@ -13,6 +13,7 @@ const LABELS: Record<string, string> = {
   edit: "Editar",
   create: "Crear",
   "planning-academic": "Planeación Académica",
+  user: "Usuario",
 };
 
 function isId(segment: string) {

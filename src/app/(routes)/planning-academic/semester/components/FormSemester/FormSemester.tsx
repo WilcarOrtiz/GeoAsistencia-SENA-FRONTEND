@@ -29,19 +29,19 @@ const formSchema = z.object({
   state: z.enum(SEMESTER_STATES),
 });
 
-export function FormSemester({ semester, onSuccess, onClose }: FormSemesterProps) {
+export function FormSemester({
+  semester,
+  onSuccess,
+  onClose,
+}: FormSemesterProps) {
   const isEditing = !!semester;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: semester?.name ?? "",
-      startDate: semester?.startDate
-        ? new Date(semester.startDate)
-        : undefined,
-      endDate: semester?.endDate
-        ? new Date(semester.endDate)
-        : undefined,
+      startDate: semester?.startDate ? new Date(semester.startDate) : undefined,
+      endDate: semester?.endDate ? new Date(semester.endDate) : undefined,
       state: semester?.state ?? "active",
     },
   });
@@ -51,7 +51,11 @@ export function FormSemester({ semester, onSuccess, onClose }: FormSemesterProps
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const res = isEditing
-        ? await apiClient.patch(`/semester/${semester.id}`, values)
+        ? await apiClient.patch(`/semester/${semester.id}`, {
+            name: values.name,
+            startDate: values.startDate,
+            endDate: values.endDate,
+          })
         : await apiClient.post("/semester", values);
 
       if (res.ok) {
@@ -97,10 +101,7 @@ export function FormSemester({ semester, onSuccess, onClose }: FormSemesterProps
               <F.FormItem className="flex flex-col">
                 <F.FormLabel>Fecha de Inicio</F.FormLabel>
                 <F.FormControl>
-                  <DatePicker
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
+                  <DatePicker value={field.value} onChange={field.onChange} />
                 </F.FormControl>
                 <F.FormMessage />
               </F.FormItem>
