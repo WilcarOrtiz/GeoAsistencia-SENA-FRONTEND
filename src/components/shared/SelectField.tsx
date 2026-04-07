@@ -14,7 +14,7 @@ interface SelectSharedProps {
   options: Option[];
 }
 
-export function SelectDemo({
+export function SelectField({
   value,
   onChange,
   placeholder = "Selecciona una opción",

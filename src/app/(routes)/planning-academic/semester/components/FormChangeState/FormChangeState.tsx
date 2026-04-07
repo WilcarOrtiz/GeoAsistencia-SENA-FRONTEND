@@ -2,7 +2,7 @@
 
 import * as F from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { SelectDemo } from "@/components/shared/selectDemo";
+import { SelectField } from "@/components/shared/SelectField";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -23,13 +23,13 @@ const formSchema = z.object({
   state: z.string().min(1),
 });
 
-type Props = {
+type FormChangeStateProps = {
   semester: Semester;
-  setOpen: (open: boolean) => void;
   onSuccess?: () => void;
+  onClose: () => void;
 };
 
-export function FormChangeState({ semester, setOpen, onSuccess }: Props) {
+export function FormChangeState({ semester, onSuccess, onClose }: FormChangeStateProps) {
   const nextStates = VALID_TRANSITIONS[semester.state];
 
   const options = nextStates.map((state) => ({
@@ -52,7 +52,7 @@ export function FormChangeState({ semester, setOpen, onSuccess }: Props) {
       if (res.ok) {
         toast.success(res.message);
         onSuccess?.();
-        setOpen(false);
+        onClose();
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -85,7 +85,7 @@ export function FormChangeState({ semester, setOpen, onSuccess }: Props) {
             <F.FormItem>
               <F.FormLabel>Nuevo estado</F.FormLabel>
               <F.FormControl>
-                <SelectDemo
+                <SelectField
                   options={options}
                   value={field.value}
                   onChange={field.onChange}

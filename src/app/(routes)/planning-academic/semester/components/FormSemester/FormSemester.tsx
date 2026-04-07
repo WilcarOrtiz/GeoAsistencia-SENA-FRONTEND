@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { DatePickerDemo } from "@/components/shared/datePickerDemo";
-import { SelectDemo } from "@/components/shared/selectDemo";
+import { DatePicker } from "@/components/shared/DatePicker";
+import { SelectField } from "@/components/shared/SelectField";
 import { apiClient } from "@/lib/api/api_client";
 import { toast } from "sonner";
 import axios from "axios";
@@ -29,21 +29,20 @@ const formSchema = z.object({
   state: z.enum(SEMESTER_STATES),
 });
 
-export function FormSemester(props: FormSemesterProps) {
-  const { setOpenModalCreate } = props;
-  const isEditing = !!props.semester;
+export function FormSemester({ semester, onSuccess, onClose }: FormSemesterProps) {
+  const isEditing = !!semester;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: props.semester?.name ?? "",
-      startDate: props.semester?.startDate
-        ? new Date(props.semester.startDate)
+      name: semester?.name ?? "",
+      startDate: semester?.startDate
+        ? new Date(semester.startDate)
         : undefined,
-      endDate: props.semester?.endDate
-        ? new Date(props.semester.endDate)
+      endDate: semester?.endDate
+        ? new Date(semester.endDate)
         : undefined,
-      state: props.semester?.state ?? "active",
+      state: semester?.state ?? "active",
     },
   });
 
@@ -52,13 +51,13 @@ export function FormSemester(props: FormSemesterProps) {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const res = isEditing
-        ? await apiClient.patch(`/semester/${props.semester!.id}`, values)
+        ? await apiClient.patch(`/semester/${semester.id}`, values)
         : await apiClient.post("/semester", values);
 
       if (res.ok) {
         toast.success(res.message);
-        props.onSuccess?.();
-        setOpenModalCreate(false);
+        onSuccess?.();
+        onClose();
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -71,7 +70,7 @@ export function FormSemester(props: FormSemesterProps) {
   return (
     <F.Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <F.FormField
               control={form.control}
@@ -98,7 +97,7 @@ export function FormSemester(props: FormSemesterProps) {
               <F.FormItem className="flex flex-col">
                 <F.FormLabel>Fecha de Inicio</F.FormLabel>
                 <F.FormControl>
-                  <DatePickerDemo
+                  <DatePicker
                     value={field.value}
                     onChange={field.onChange}
                   />
@@ -113,9 +112,9 @@ export function FormSemester(props: FormSemesterProps) {
             name="endDate"
             render={({ field }) => (
               <F.FormItem className="flex flex-col">
-                <F.FormLabel>Fecha de Finalización</F.FormLabel>
+                <F.FormLabel>Fecha de Finalizacion</F.FormLabel>
                 <F.FormControl>
-                  <DatePickerDemo
+                  <DatePicker
                     value={field.value}
                     onChange={field.onChange}
                     minDate={form.watch("startDate")}
@@ -135,7 +134,7 @@ export function FormSemester(props: FormSemesterProps) {
                   <F.FormItem>
                     <F.FormLabel>Estado</F.FormLabel>
                     <F.FormControl>
-                      <SelectDemo
+                      <SelectField
                         options={STATUS_OPTIONS}
                         value={field.value}
                         onChange={field.onChange}
