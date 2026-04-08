@@ -18,6 +18,9 @@ export async function login(formData: { email: string; password: string }) {
 export async function sendRecoveryEmail(formData: { email: string }) {
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
+
+
+  
   const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
     redirectTo: `${origin}/confirm`,
   });

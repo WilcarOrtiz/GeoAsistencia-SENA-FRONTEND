@@ -24,6 +24,17 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 
 import { Pagination } from "@/components/shared/Pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  ROLE_LABELS,
+  ROLE_SYSTEM_KEYS,
+} from "@/features/roleAndPermission/role.constants";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -64,13 +75,36 @@ export function DataTable<TData, TValue>({
     <div>
       <div className="flex items-center gap-4 py-4">
         <Input
-          placeholder="Filtrar por nombre..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          placeholder="Filtrar por correo universitario."
+          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
+            table.getColumn("email")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
+
+        <Select
+          value={
+            (table.getColumn("roles")?.getFilterValue() as string) ?? "all"
+          }
+          onValueChange={(value) =>
+            table
+              .getColumn("roles")
+              ?.setFilterValue(value === "all" ? "" : value)
+          }
+        >
+          <SelectTrigger className="w-[150px]">
+            <SelectValue placeholder="Rol" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            {ROLE_SYSTEM_KEYS.map((roleKey) => (
+              <SelectItem key={roleKey} value={roleKey}>
+                {ROLE_LABELS[roleKey]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="overflow-hidden rounded-md border">

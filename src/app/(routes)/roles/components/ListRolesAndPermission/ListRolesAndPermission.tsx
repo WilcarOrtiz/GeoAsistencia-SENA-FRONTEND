@@ -5,12 +5,10 @@ import { apiClient } from "@/lib/api/api_client";
 import { PaginatedData } from "@/types/api";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
 import { Input } from "@/components/ui/input";
-import {
-  Permission,
-  Role,
-} from "@/features/roleAndPermission/roleAndPermission.type";
+import { Permission } from "@/features/roleAndPermission/roleAndPermission.type";
 import { PermissionMatrix } from "../PermissionMatrix/PermissionMatrix";
 import { Pagination } from "@/components/shared/Pagination";
+import { useRoles } from "@/hooks/userRoles";
 
 export default function ListRolesAndPermission() {
   const [data, setData] = useState<Permission[]>([]);
@@ -23,21 +21,18 @@ export default function ListRolesAndPermission() {
 
   const totalPages = Math.ceil(total / LIMIT);
 
-  const [roles, setRoles] = useState<Role[]>([]);
+  const { roles, loading: loadingRoles } = useRoles();
 
   useEffect(() => {
     const fetch = async () => {
       setLoading(true);
       try {
-        const [permRes, rolesRes] = await Promise.all([
-          apiClient.get<PaginatedData<Permission>>(
-            `/permissions/matrix?page=${page}&limit=${LIMIT}`,
-          ),
-          apiClient.get<Role[]>(`/role`),
-        ]);
+        const permRes = await apiClient.get<PaginatedData<Permission>>(
+          `/permissions/matrix?page=${page}&limit=${LIMIT}`,
+        );
+
         setData(permRes.data.data);
         setTotal(permRes.data.total);
-        setRoles(rolesRes.data);
       } catch {
         console.error("Error al cargar");
       } finally {
@@ -53,7 +48,7 @@ export default function ListRolesAndPermission() {
       p.name.toLowerCase().includes(search.toLowerCase()),
   );
 
-  if (loading) return <TableSkeleton />;
+  if (loading || loadingRoles) return <TableSkeleton />;
 
   return (
     <div className="container mx-auto py-10 space-y-4">

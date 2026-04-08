@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-
 import { createColumns } from "./components/ListSubject/columns";
 import { DataTable } from "./components/ListSubject/DataTable";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";

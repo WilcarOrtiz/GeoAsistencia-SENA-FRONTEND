@@ -16,6 +16,10 @@ import {
   Permission,
   Role,
 } from "@/features/roleAndPermission/roleAndPermission.type";
+import {
+  ROLE_LABELS,
+  RoleSystem,
+} from "@/features/roleAndPermission/role.constants";
 
 interface Props {
   permissions: Permission[];
@@ -55,7 +59,9 @@ export function PermissionMatrix({
 
       onPermissionsChange(updated);
       toast.success(
-        checked ? `Asignado a ${role.name}` : `Removido de ${role.name}`,
+        checked
+          ? `Asignado a ${ROLE_LABELS[role.name as RoleSystem]}`
+          : `Removido de ${ROLE_LABELS[role.name as RoleSystem]}`,
       );
     } catch {
       toast.error("Error al actualizar permiso");
@@ -73,7 +79,7 @@ export function PermissionMatrix({
             <TableHead>Descripción</TableHead>
             {roles.map((r) => (
               <TableHead key={r.id} className="text-center">
-                {r.name}
+                {ROLE_LABELS[r.name as RoleSystem]}
               </TableHead>
             ))}
           </TableRow>

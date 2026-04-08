@@ -1,52 +1,29 @@
 "use client";
 
 import { useMemo } from "react";
-
 import { createColumns } from "./components/ListSubject/columns";
 import { DataTable } from "./components/ListSubject/DataTable";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-
-import { AlertDialogDestructive } from "@/components/shared/AlertDialogDestructive";
-
-import { FormSubject } from "./components/FormSubject";
-
-import { useSubjects } from "../planning-academic/subject/hooks";
+import { useUsers } from "./hooks";
 import { HeaderUserManagement } from "./components/HeaderUserManagement";
 
-export default function SubjectPage() {
+export default function UserPage() {
   const {
-    subjects,
+    users,
     total,
     isLoading,
     page,
     limit,
     setPage,
-    modal,
-    openModal,
-    closeModal,
-    handleDelete,
-    refreshData,
-  } = useSubjects();
+    handleCreate,
+    handleEdit,
+  } = useUsers();
 
-  const columns = useMemo(
-    () =>
-      createColumns(
-        (subject) => openModal("edit", subject),
-        (id) => openModal("delete", { id } as never),
-      ),
-    [openModal],
-  );
+  const columns = useMemo(() => createColumns(handleEdit), [handleEdit]);
 
   return (
     <div>
-      <HeaderUserManagement onCreateClick={() => openModal("create")} />
+      <HeaderUserManagement onCreateClick={handleCreate} />
 
       <div className="container mx-auto py-10">
         {isLoading ? (
@@ -54,7 +31,7 @@ export default function SubjectPage() {
         ) : (
           <DataTable
             columns={columns}
-            data={subjects}
+            data={users}
             total={total}
             page={page}
             limit={limit}
@@ -62,41 +39,8 @@ export default function SubjectPage() {
           />
         )}
       </div>
-
-      {/* Modal Crear/Editar */}
-      <Dialog
-        open={modal.type === "create" || modal.type === "edit"}
-        onOpenChange={(open) => !open && closeModal()}
-      >
-        <DialogContent className="sm:max-w-[625px]">
-          <DialogHeader>
-            <DialogTitle>
-              {modal.type === "edit"
-                ? "Editar materia"
-                : "Registrar una materia"}
-            </DialogTitle>
-            {modal.type === "create" && (
-              <DialogDescription>
-                Crea y configura una nueva materia academica
-              </DialogDescription>
-            )}
-          </DialogHeader>
-          <FormSubject
-            subject={modal.subject}
-            onSuccess={refreshData}
-            onClose={closeModal}
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* Modal Eliminar */}
-      <AlertDialogDestructive
-        open={modal.type === "delete"}
-        onOpenChange={closeModal}
-        onConfirm={handleDelete}
-        title="Eliminar asignatura?"
-        description="Ten en cuenta que esta accion no se puede deshacer, asi que verifica antes de continuar."
-      />
     </div>
   );
 }
+
+<div className="container mx-auto py-10"></div>;

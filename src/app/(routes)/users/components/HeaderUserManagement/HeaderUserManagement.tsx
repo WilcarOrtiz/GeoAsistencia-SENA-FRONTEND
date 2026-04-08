@@ -18,15 +18,15 @@ export function HeaderUserManagement({ onCreateClick }: HeaderSubjectProps) {
         />
 
         <div className="flex flex-wrap justify-between gap-5">
-          
           <Button
             variant="success"
             className="flex items-center gap-2"
-            onClick={onCreateClick}
+            onClick={() => console.log("descargar")}
           >
             <Upload className="h-5 w-5" />
             Importar CSV/Excel
           </Button>
+
           <Button className="flex items-center gap-2" onClick={onCreateClick}>
             <UserRoundPlus className="h-5 w-5" />
             Agregar nuevo usuario

@@ -10,6 +10,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { sendRecoveryEmail } from "@/actions/auth/auth";
 import { useRouter } from "next/navigation";
+import { isUserActive } from "@/actions/auth/get-user";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Correo electrónico inválido"),
@@ -32,25 +33,41 @@ const ForgotPasswordForm = () => {
   const onSubmit = async (values: ForgotPasswordValues) => {
     setLoading(true);
 
-    const result = await sendRecoveryEmail(values);
+    try {
+      const res = await isUserActive(values.email);
 
-    if (!result.success) {
-      toast.error("Error", {
-        description: result.message,
-        position: "top-center",
-      });
-    } else {
-      toast.success("Enlace enviado", {
-        description: result.message,
-        position: "top-center",
-      });
+      if (!res) {
+        toast.error("Usuario inactivo o no registrado", {
+          position: "top-center",
+        });
+        router.push("/error");
+        setLoading(false);
+        return;
+      }
 
-      setTimeout(() => {
-        router.push("/login");
-      }, 3500);
+      const result = await sendRecoveryEmail(values);
+
+      if (!result.success) {
+        toast.error("Error al enviar correo", {
+          description: result.message,
+          position: "top-center",
+        });
+      } else {
+        toast.success("Enlace enviado", {
+          description: result.message,
+          position: "top-center",
+        });
+
+        setTimeout(() => {
+          router.push("/login");
+        }, 3500);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Error inesperado", { position: "top-center" });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (

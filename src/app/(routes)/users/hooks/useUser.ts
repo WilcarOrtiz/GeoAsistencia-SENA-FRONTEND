@@ -1,115 +1,48 @@
 "use client";
+
 import { useState, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { apiClient } from "@/lib/api/api_client";
 import { PaginatedData } from "@/types/api";
-import { toast } from "sonner";
-import { AxiosError } from "axios";
 import useSWR from "swr";
-import { Subject } from "@/features/subject/subject.type";
-
-type ModalType = "create" | "edit" | "changeState" | "delete" | null;
-
-interface ModalState {
-  type: ModalType;
-  subject?: Subject;
-}
+import { User } from "@/features/User/user.type";
 
 const fetcher = async (url: string) => {
-  const { data } = await apiClient.get<PaginatedData<Subject>>(url);
+  const { data } = await apiClient.get<PaginatedData<User>>(url);
   return data;
 };
 
-export function useSubjects(limit = 10) {
+export function useUsers(limit = 10) {
+  const router = useRouter();
   const [page, setPage] = useState(1);
-  const [modal, setModal] = useState<ModalState>({ type: null });
 
-  const { data, isLoading, mutate } = useSWR(
-    `/subjects?page=${page}&limit=${limit}`,
+  const { data, isLoading } = useSWR(
+    `/user?page=${page}&limit=${limit}`,
     fetcher,
   );
 
-  const openModal = useCallback((type: ModalType, subject?: Subject) => {
-    setModal({ type, subject });
-  }, []);
+  const handleCreate = useCallback(() => {
+    router.push("/users/create");
+  }, [router]);
 
-  const closeModal = useCallback(() => {
-    setModal({ type: null });
-  }, []);
-
-  const handleDelete = useCallback(async () => {
-    if (!modal.subject?.id) return;
-
-    const id = modal.subject.id;
-
-    // 🔥 1. Actualización optimista (INMEDIATA)
-    mutate((currentData) => {
-      if (!currentData) return currentData;
-
-      return {
-        ...currentData,
-        data: currentData.data.filter((item) => item.id !== id),
-        total: currentData.total - 1,
-      };
-    }, false); // ❗ sin refetch
-
-    try {
-      const res = await apiClient.delete(`/subjects/${id}`);
-
-      toast.success("Acción realizada", {
-        description: res.message,
-        position: "top-center",
-      });
-
-      closeModal();
-    } catch (error) {
-      // 🔥 2. rollback si falla
-      mutate(); // aquí sí refetch
-
-      closeModal();
-
-      if (error instanceof AxiosError) {
-        toast.error(
-          error.response?.data?.message ?? "No se pudo eliminar el semestre",
-        );
-      }
-    }
-  }, [modal.subject, mutate, closeModal]);
-
-  const refreshData = useCallback(() => {
-    mutate();
-  }, [mutate]);
+  const handleEdit = useCallback(
+    (user: User) => {
+      router.push(`/user/${user.auth_id}`);
+    },
+    [router],
+  );
 
   return useMemo(
     () => ({
-      // Data
-      subjects: data?.data ?? [],
+      users: data?.data ?? [],
       total: data?.total ?? 0,
       isLoading,
-
-      // Pagination
       page,
       limit,
       setPage,
-
-      // Modal state
-      modal,
-      openModal,
-      closeModal,
-
-      // Actions
-      handleDelete,
-      refreshData,
+      handleCreate,
+      handleEdit,
     }),
-    [
-      data,
-      isLoading,
-      page,
-      limit,
-      modal,
-      openModal,
-      closeModal,
-      handleDelete,
-      refreshData,
-    ],
+    [data, isLoading, page, limit, handleCreate, handleEdit],
   );
 }

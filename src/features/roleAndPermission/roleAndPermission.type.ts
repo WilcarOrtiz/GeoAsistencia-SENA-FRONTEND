@@ -1,10 +1,8 @@
-import { ROlE_SYSTEM } from "./roleAndPermission.constants";
-
-export type roleSystem = keyof typeof ROlE_SYSTEM;
+import { RoleSystem } from "./role.constants";
 
 export interface Role {
   id: string;
-  name: roleSystem;
+  name: RoleSystem;
   description: number;
   is_active: boolean;
 }
