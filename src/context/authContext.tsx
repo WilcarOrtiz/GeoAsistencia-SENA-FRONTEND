@@ -11,6 +11,7 @@ import {
   useState,
   useCallback,
 } from "react";
+import { Console } from "console";
 
 export type AppUser = UserProfile["user"] & {
   email: string | null;
@@ -40,7 +41,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       const profile = await getProfile();
-      setUserProfile(profile ?? null);
+
+      if (!profile) {
+        await supabase.auth.signOut();
+        window.location.href = "/error";
+        return;
+      }
+
+      setUserProfile(profile);
     } catch (error) {
       console.error("Error fetching user profile:", error);
       setUserProfile(null);
@@ -80,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ? {
             ...userProfile.user,
             email: supabaseEmail,
-            roles: userProfile.roles.map((r) => r.name),
+            roles: userProfile.roles.map((r) => String(r.name)),
           }
         : null,
       permissions: userProfile?.permissions ?? [],

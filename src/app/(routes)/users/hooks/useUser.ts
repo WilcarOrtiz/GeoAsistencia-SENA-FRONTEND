@@ -16,7 +16,7 @@ export function useUsers(limit = 10) {
   const router = useRouter();
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useSWR(
+  const { data, isLoading, mutate } = useSWR(
     `/user?page=${page}&limit=${limit}`,
     fetcher,
   );
@@ -32,6 +32,23 @@ export function useUsers(limit = 10) {
     [router],
   );
 
+  const handleChangeState = useCallback(
+    async (user: User) => {
+      try {
+        const res = user.is_active
+          ? await apiClient.patch(`/user/${user.auth_id}/deactivate`)
+          : await apiClient.patch(`/user/${user.auth_id}/activate`);
+
+        if (res.ok) {
+          await mutate();
+        }
+      } catch (error) {
+        console.error("Error cambiando estado:", error);
+      }
+    },
+    [mutate],
+  );
+
   return useMemo(
     () => ({
       users: data?.data ?? [],
@@ -42,7 +59,8 @@ export function useUsers(limit = 10) {
       setPage,
       handleCreate,
       handleEdit,
+      handleChangeState,
     }),
-    [data, isLoading, page, limit, handleCreate, handleEdit],
+    [data, isLoading, page, limit, handleCreate, handleEdit, handleChangeState],
   );
 }

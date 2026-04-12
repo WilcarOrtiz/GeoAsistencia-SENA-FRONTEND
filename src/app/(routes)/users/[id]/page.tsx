@@ -1,7 +1,9 @@
-export default function CreateUserPage() {
+import { Formuser } from "../components/FormUser";
+
+export default function UpdateUserPage() {
   return (
     <div className="container mx-auto pt-4">
-      <h1> Edicionm</h1>
+      <Formuser />
     </div>
   );
 }

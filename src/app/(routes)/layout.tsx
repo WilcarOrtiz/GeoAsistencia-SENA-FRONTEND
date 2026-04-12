@@ -17,11 +17,10 @@ export default function DashboardLayout({
           <div className="flex items-center justify-between w-full px-4">
             {/* Izquierda */}
             <div className="flex items-center gap-2">
-              <S.SidebarTrigger className="-ml-1" />
+              <S.SidebarTrigger />
               <Separator orientation="vertical" className="h-4" />
               <DynamicBreadcrumb />
             </div>
-
             {/* Derecha */}
             <ThemeToggle />
           </div>

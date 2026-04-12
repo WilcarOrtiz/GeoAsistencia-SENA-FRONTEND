@@ -46,8 +46,9 @@ export function Formuser({ user }: FormUserProps) {
   const isEditing = !!user;
   const { roles, loading: loadingRoles } = useRoles();
 
-  const [roleIds, setRoleIds] = useState<string[]>([]);
-
+  const [roleIds, setRoleIds] = useState<string[]>(
+    user?.roles?.map((r) => r.id) ?? [],
+  );
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -260,3 +261,6 @@ export function Formuser({ user }: FormUserProps) {
     </F.Form>
   );
 }
+
+//TODO: Agregar el action para activar o desactivar user.
+//  agregar para envioar correo de recuperacion de cuenta.

@@ -1,6 +1,6 @@
-import { ROlE_SYSTEM } from "@/features/roleAndPermission/roleAndPermission.constants";
+import { ROLE_SYSTEM } from "@/features/roleAndPermission/role.constants";
 
-export type roleSystem = keyof typeof ROlE_SYSTEM;
+export type roleSystem = keyof typeof ROLE_SYSTEM;
 
 export interface NavigationItem {
   id: string;

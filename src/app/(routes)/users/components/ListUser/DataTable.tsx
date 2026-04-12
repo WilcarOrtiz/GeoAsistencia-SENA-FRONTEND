@@ -73,38 +73,72 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center gap-4 py-4">
-        <Input
-          placeholder="Filtrar por correo universitario."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+      <div className="flex flex-col sm:flex-row sm:items-end gap-3 py-4">
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-muted-foreground">Correo</span>
+          <Input
+            placeholder="Filtrar correo..."
+            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+            onChange={(e) =>
+              table.getColumn("email")?.setFilterValue(e.target.value)
+            }
+            className="w-full sm:w-[240px]"
+          />
+        </div>
 
-        <Select
-          value={
-            (table.getColumn("roles")?.getFilterValue() as string) ?? "all"
-          }
-          onValueChange={(value) =>
-            table
-              .getColumn("roles")
-              ?.setFilterValue(value === "all" ? "" : value)
-          }
-        >
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Rol" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            {ROLE_SYSTEM_KEYS.map((roleKey) => (
-              <SelectItem key={roleKey} value={roleKey}>
-                {ROLE_LABELS[roleKey]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex gap-3 flex-col xs:flex-row sm:flex-row">
+          {/* Filtro según rol */}
+          <div className="flex flex-col gap-1">
+            <span className="text-xs text-muted-foreground">Rol</span>
+            <Select
+              value={
+                (table.getColumn("roles")?.getFilterValue() as string) ?? "all"
+              }
+              onValueChange={(value) =>
+                table
+                  .getColumn("roles")
+                  ?.setFilterValue(value === "all" ? "" : value)
+              }
+            >
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Todos los roles" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                {ROLE_SYSTEM_KEYS.map((roleKey) => (
+                  <SelectItem key={roleKey} value={roleKey}>
+                    {ROLE_LABELS[roleKey]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Filtro de estado */}
+          <div className="flex flex-col gap-1">
+            <span className="text-xs text-muted-foreground">Estado</span>
+            <Select
+              value={
+                (table.getColumn("is_active")?.getFilterValue() as string) ??
+                "all"
+              }
+              onValueChange={(value) =>
+                table
+                  .getColumn("is_active")
+                  ?.setFilterValue(value === "all" ? "" : value)
+              }
+            >
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Todos" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="true">Activos</SelectItem>
+                <SelectItem value="false">Inactivos</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-md border">

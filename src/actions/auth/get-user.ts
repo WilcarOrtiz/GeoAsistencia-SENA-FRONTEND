@@ -24,7 +24,7 @@ export const getProfile = async (): Promise<UserProfile | null> => {
       return null;
     }
 
-    console.log(response.data);
+    console.log("REPSUESTA DEL GET PROFILE", response.data);
 
     return response.data;
   } catch (error) {

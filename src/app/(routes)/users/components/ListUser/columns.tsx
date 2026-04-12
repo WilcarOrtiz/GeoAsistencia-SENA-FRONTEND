@@ -9,11 +9,45 @@ import {
   ROLE_LABELS,
   RoleSystem,
 } from "@/features/roleAndPermission/role.constants";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 export const createColumns = (
-  onEdit: (subject: User) => void,
+  onEdit: (user: User) => void,
+  onChangeState: (user: User) => void,
 ): ColumnDef<User>[] => [
-  { accessorKey: "ID_user", header: "Identificacion" },
+  {
+    accessorKey: "is_active",
+    header: " ",
+    filterFn: (row, columnId, filterValue) => {
+      if (filterValue === "" || filterValue === "all") return true;
+      const isActive = row.getValue(columnId) as boolean;
+      return filterValue === "true" ? isActive : !isActive;
+    },
+    cell: ({ row }) => {
+      const user = row.original;
+      return (
+        <div className="flex items-center justify-start gap-2">
+          <span
+            className={cn(
+              "h-2 w-2 rounded-full shrink-0",
+              user.is_active ? "bg-status-active" : "bg-status-inactive",
+            )}
+          />
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "ID_user",
+    header: "Identificacion",
+  },
   { accessorKey: "email", header: "Email" },
   {
     accessorKey: "first_name",
@@ -93,16 +127,27 @@ export const createColumns = (
     id: "actions",
     cell: ({ row }) => {
       const user = row.original;
+
       return (
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className=" "
-            onClick={() => onEdit(user)}
-          >
-            <I.Pencil className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <I.MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => onEdit(user)}>
+                <I.Pencil className="mr-2 h-4 w-4" />
+                Editar
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onChangeState(user)}>
+                <I.RefreshCw className="mr-2 h-4 w-4" />
+                {!user.is_active ? "Habilitar" : "Inhabilitar"}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       );
     },

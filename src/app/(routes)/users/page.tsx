@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { createColumns } from "./components/ListSubject/columns";
-import { DataTable } from "./components/ListSubject/DataTable";
+import { createColumns } from "./components/ListUser/columns";
+import { DataTable } from "./components/ListUser/DataTable";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
 import { useUsers } from "./hooks";
 import { HeaderUserManagement } from "./components/HeaderUserManagement";
@@ -17,9 +17,13 @@ export default function UserPage() {
     setPage,
     handleCreate,
     handleEdit,
+    handleChangeState,
   } = useUsers();
 
-  const columns = useMemo(() => createColumns(handleEdit), [handleEdit]);
+  const columns = useMemo(
+    () => createColumns(handleEdit, handleChangeState),
+    [handleEdit, handleChangeState],
+  );
 
   return (
     <div>

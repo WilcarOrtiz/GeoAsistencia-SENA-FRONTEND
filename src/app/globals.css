@@ -55,7 +55,10 @@ body,
 
   /*VARIANMTES PROPIAS*/
     --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
+    --color-success-foreground: var(--success-foreground);
+
+    --color-status-active: var(--status-active);
+--color-status-inactive: var(--status-inactive);
 }
 
 :root {
@@ -96,6 +99,11 @@ body,
   /*este color es del excel*/
   --success: oklch(0.7 0.15 145); /* verde bonito */
   --success-foreground: oklch(1 0 0); /* texto blanco */
+
+
+   /*Span indicador de si esta activo o no */
+  --status-active: oklch(0.72 0.16 145);
+--status-inactive: oklch(66.991% 0.17138 51.923);
 }
 
 .dark {
@@ -134,6 +142,10 @@ body,
   /*este color es del excel*/
   --success: oklch(0.6 0.18 145); /* un poco más intenso */
   --success-foreground: oklch(0.98 0 0); /* casi blanco */
+
+  /*Span indicador de si esta activo o no */
+  --status-active: oklch(0.7 0.18 145);
+--status-inactive: oklch(0.5 0.01 250);
 
 }
 

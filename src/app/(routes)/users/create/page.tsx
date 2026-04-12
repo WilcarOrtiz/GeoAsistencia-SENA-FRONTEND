@@ -1,5 +1,5 @@
 import { PageHeader } from "@/components/shared/PageHeader";
-import { Formuser } from "../components/FormSubject";
+import { Formuser } from "../components/FormUser";
 
 export default function CreateUserPage() {
   return (
