@@ -2,10 +2,8 @@
 
 import {
   ColumnDef,
-  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
@@ -43,6 +41,12 @@ interface DataTableProps<TData, TValue> {
   page: number;
   limit: number;
   onPageChange: (page: number) => void;
+  emailInput: string;
+  role: string;
+  isActive: string;
+  onEmailChange: (value: string) => void;
+  onRoleChange: (value: string) => void;
+  onIsActiveChange: (value: string) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -52,11 +56,16 @@ export function DataTable<TData, TValue>({
   page,
   limit,
   onPageChange,
+  emailInput,
+  role,
+  isActive,
+  onEmailChange,
+  onRoleChange,
+  onIsActiveChange,
 }: DataTableProps<TData, TValue>) {
   const totalPages = Math.ceil(total / limit);
 
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   const table = useReactTable({
@@ -65,10 +74,8 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    state: { sorting, columnFilters, columnVisibility },
+    state: { sorting, columnVisibility },
   });
 
   return (
@@ -78,10 +85,8 @@ export function DataTable<TData, TValue>({
           <span className="text-xs text-muted-foreground">Correo</span>
           <Input
             placeholder="Filtrar correo..."
-            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-            onChange={(e) =>
-              table.getColumn("email")?.setFilterValue(e.target.value)
-            }
+            value={emailInput}
+            onChange={(e) => onEmailChange(e.target.value)}
             className="w-full sm:w-[240px]"
           />
         </div>
@@ -90,16 +95,7 @@ export function DataTable<TData, TValue>({
           {/* Filtro según rol */}
           <div className="flex flex-col gap-1">
             <span className="text-xs text-muted-foreground">Rol</span>
-            <Select
-              value={
-                (table.getColumn("roles")?.getFilterValue() as string) ?? "all"
-              }
-              onValueChange={(value) =>
-                table
-                  .getColumn("roles")
-                  ?.setFilterValue(value === "all" ? "" : value)
-              }
-            >
+            <Select value={role || "all"} onValueChange={onRoleChange}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Todos los roles" />
               </SelectTrigger>
@@ -117,17 +113,7 @@ export function DataTable<TData, TValue>({
           {/* Filtro de estado */}
           <div className="flex flex-col gap-1">
             <span className="text-xs text-muted-foreground">Estado</span>
-            <Select
-              value={
-                (table.getColumn("is_active")?.getFilterValue() as string) ??
-                "all"
-              }
-              onValueChange={(value) =>
-                table
-                  .getColumn("is_active")
-                  ?.setFilterValue(value === "all" ? "" : value)
-              }
-            >
+            <Select value={isActive || "all"} onValueChange={onIsActiveChange}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Todos" />
               </SelectTrigger>

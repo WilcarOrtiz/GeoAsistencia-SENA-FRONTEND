@@ -65,18 +65,49 @@ export function Formuser({ user }: FormUserProps) {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const res = isEditing
-        ? await apiClient.patch(`/users/${user.auth_id}`, values)
-        : await apiClient.post("/user", values);
+      if (isEditing) {
+        const promises: Promise<unknown>[] = [];
 
-      if (res.ok) {
-        toast.success(res.message);
-        mutate((key) => typeof key === "string" && key.startsWith("/user"));
-        router.push("/users");
+        promises.push(
+          apiClient.patch(`/user/${user.auth_id}`, {
+            ID: values.ID,
+            first_name: values.first_name,
+            middle_name: values.middle_name,
+            last_name: values.last_name,
+            second_last_name: values.second_last_name,
+            email: values.email,
+          }),
+        );
+
+        const originalRoleIds = user.roles.map((r) => r.id).sort();
+        const newRoleIds = [...roleIds].sort();
+        const rolesChanged =
+          JSON.stringify(originalRoleIds) !== JSON.stringify(newRoleIds);
+
+        if (rolesChanged) {
+          promises.push(
+            apiClient.patch(`/user/${user.auth_id}/roles`, {
+              rolesID: roleIds,
+            }),
+          );
+        }
+
+        await Promise.all(promises);
+
+        toast.success("Usuario actualizado correctamente", {
+          position: "top-center",
+        });
+      } else {
+        await apiClient.post("/user", values);
+        toast.success("Usuario creado correctamente", {
+          position: "top-center",
+        });
       }
+
+      mutate((key) => typeof key === "string" && key.startsWith("/user"));
+      router.push("/users");
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log(values);
         const message = error.response?.data?.message ?? "Opps, algo anda mal";
         toast.error(message, { position: "top-center" });
       }
@@ -262,5 +293,3 @@ export function Formuser({ user }: FormUserProps) {
   );
 }
 
-//TODO: Agregar el action para activar o desactivar user.
-//  agregar para envioar correo de recuperacion de cuenta.

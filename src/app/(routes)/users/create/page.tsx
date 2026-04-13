@@ -7,6 +7,7 @@ export default function CreateUserPage() {
       <PageHeader
         title="Registro de Usuarios"
         description="Registra la informacion basica de un usuario del sistema, no olvides asignarle un rol"
+        backHref="/users"
       />
       <div className="container mx-auto py-10 ">
         <Formuser />
@@ -14,4 +15,3 @@ export default function CreateUserPage() {
     </div>
   );
 }
-//TODO: hacer lo referente a crear la funcion de reenviar correo de recuperaicon de cuenta a Adminsitrador

@@ -145,7 +145,7 @@ body,
 
   /*Span indicador de si esta activo o no */
   --status-active: oklch(0.7 0.18 145);
---status-inactive: oklch(0.5 0.01 250);
+--status-inactive: oklch(59.443% 0.24294 355.261);
 
 }
 

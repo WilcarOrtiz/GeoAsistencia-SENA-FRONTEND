@@ -16,13 +16,20 @@ export default function UserPage() {
     limit,
     setPage,
     handleCreate,
+    handleSendRecoveryEmail,
     handleEdit,
     handleChangeState,
+    emailInput,
+    role,
+    isActive,
+    handleEmailSearch,
+    handleRoleFilter,
+    handleIsActiveFilter,
   } = useUsers();
 
   const columns = useMemo(
-    () => createColumns(handleEdit, handleChangeState),
-    [handleEdit, handleChangeState],
+    () => createColumns(handleSendRecoveryEmail, handleEdit, handleChangeState),
+    [handleSendRecoveryEmail, handleEdit, handleChangeState],
   );
 
   return (
@@ -40,6 +47,12 @@ export default function UserPage() {
             page={page}
             limit={limit}
             onPageChange={setPage}
+            emailInput={emailInput}
+            role={role}
+            isActive={isActive}
+            onEmailChange={handleEmailSearch}
+            onRoleChange={handleRoleFilter}
+            onIsActiveChange={handleIsActiveFilter}
           />
         )}
       </div>

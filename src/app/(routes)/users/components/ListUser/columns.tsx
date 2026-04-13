@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export const createColumns = (
+  onSendRecoveryEmail: (user: User) => void,
   onEdit: (user: User) => void,
   onChangeState: (user: User) => void,
 ): ColumnDef<User>[] => [
@@ -145,6 +146,10 @@ export const createColumns = (
               <DropdownMenuItem onClick={() => onChangeState(user)}>
                 <I.RefreshCw className="mr-2 h-4 w-4" />
                 {!user.is_active ? "Habilitar" : "Inhabilitar"}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onSendRecoveryEmail(user)}>
+                <I.Mail className="mr-2 h-4 w-4" />
+                Enviar recuperación
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
