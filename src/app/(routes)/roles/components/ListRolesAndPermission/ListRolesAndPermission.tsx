@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Permission } from "@/features/roleAndPermission/roleAndPermission.type";
 import { PermissionMatrix } from "../PermissionMatrix/PermissionMatrix";
 import { Pagination } from "@/components/shared/Pagination";
-import { useRoles } from "@/hooks/userRoles";
+import { useRoles } from "@/hooks/Roles";
 
 export default function ListRolesAndPermission() {
   const [data, setData] = useState<Permission[]>([]);

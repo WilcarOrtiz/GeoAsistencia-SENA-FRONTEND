@@ -12,3 +12,9 @@ export interface User {
   email: string;
   roles: { id: string; name: RoleSystem }[];
 }
+
+export interface teacher {
+  id: string;
+  name: string;
+  document: string;
+}

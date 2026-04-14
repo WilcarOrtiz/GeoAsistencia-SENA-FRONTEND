@@ -12,7 +12,6 @@ import axios from "axios";
 import { FormUserProps } from "./FormUser.type";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
-import { useRoles } from "@/hooks/userRoles";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import {
@@ -26,6 +25,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useRoles } from "@/hooks/ApiList";
 
 const formSchema = z.object({
   ID: z
@@ -44,7 +44,7 @@ const formSchema = z.object({
 
 export function Formuser({ user }: FormUserProps) {
   const isEditing = !!user;
-  const { roles, loading: loadingRoles } = useRoles();
+  const { data: roles, loading } = useRoles();
 
   const [roleIds, setRoleIds] = useState<string[]>(
     user?.roles?.map((r) => r.id) ?? [],
@@ -292,4 +292,3 @@ export function Formuser({ user }: FormUserProps) {
     </F.Form>
   );
 }
-

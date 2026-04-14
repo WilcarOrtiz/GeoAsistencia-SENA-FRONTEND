@@ -14,7 +14,7 @@ export function NavSettings({ items }: { items: NavigationItem[] }) {
       name: "Planeación académica",
       route: "CalendarClock",
       icon: "BarChart3",
-      order_index: 5,
+      order_index: 1,
       children: [
         {
           id: "55b1b23b-01d1-4984-888f-d839be357cfa",
@@ -40,7 +40,7 @@ export function NavSettings({ items }: { items: NavigationItem[] }) {
       name: "Roles y permisos",
       route: "/roles",
       icon: "ShieldUser",
-      order_index: 5,
+      order_index: 2,
       children: [],
     },
 
@@ -49,7 +49,15 @@ export function NavSettings({ items }: { items: NavigationItem[] }) {
       name: "Gestion de usuario",
       route: "/users",
       icon: "UserCog",
-      order_index: 5,
+      order_index: 3,
+      children: [],
+    },
+    {
+      id: "5ff8365a-15f8-49e3-8b2e-1018fd588952",
+      name: "Gestion de grupos de clase",
+      route: "/academic-groups",
+      icon: "LayoutGrid",
+      order_index: 4,
       children: [],
     },
   ];

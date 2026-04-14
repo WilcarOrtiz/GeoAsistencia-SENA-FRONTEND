@@ -12,3 +12,9 @@ export interface Semester {
   endDate: string;
   state: SemesterState;
 }
+
+export interface SemesterBasic {
+  id: string;
+  code: string;
+  name: string;
+}
