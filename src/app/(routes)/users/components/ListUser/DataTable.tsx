@@ -33,6 +33,7 @@ import {
   ROLE_LABELS,
   ROLE_SYSTEM_KEYS,
 } from "@/features/roleAndPermission/role.constants";
+import { GenericSelect } from "@/components/shared/select";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -95,19 +96,19 @@ export function DataTable<TData, TValue>({
           {/* Filtro según rol */}
           <div className="flex flex-col gap-1">
             <span className="text-xs text-muted-foreground">Rol</span>
-            <Select value={role || "all"} onValueChange={onRoleChange}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Todos los roles" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                {ROLE_SYSTEM_KEYS.map((roleKey) => (
-                  <SelectItem key={roleKey} value={roleKey}>
-                    {ROLE_LABELS[roleKey]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+
+            <GenericSelect
+              options={[
+                { label: "Todos", value: "all" },
+                ...ROLE_SYSTEM_KEYS.map((roleKey) => ({
+                  label: ROLE_LABELS[roleKey],
+                  value: roleKey,
+                })),
+              ]}
+              defaultValue={role || "all"} // 👈 controlado
+              onSelect={onRoleChange}
+              placeholder="Todos los roles"
+            />
           </div>
 
           {/* Filtro de estado */}

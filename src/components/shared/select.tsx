@@ -122,7 +122,7 @@ export function GenericSelect({
               {options.map((option) => (
                 <CommandItem
                   key={option.value}
-                  value={option.label} // Command filtra por este campo
+                  value={option.label}
                   onSelect={() => handleSelect(option.value)}
                 >
                   <Check
@@ -143,11 +143,12 @@ export function GenericSelect({
 }
 
 // ── Helpers de mapeo ──────────────────────────────────────────────────────────
-// Usá estas funciones para convertir tus entidades a SelectOption[]
-// ajustá el path
 
+/*
 export const semestersToOptions = (items: SemesterBasic[]): SelectOption[] =>
-  items.map((s) => ({ value: s.id, label: `${s.code} – ${s.name}` }));
+  items.map((s) => ({ value: s.id, label: `${s.code} – ${s.name}` }));*/
+export const semestersToOptions = (items: SemesterBasic[]): SelectOption[] =>
+  items.map((s) => ({ value: s.id, label: `${s.code}` }));
 
 export const subjectsToOptions = (items: Subject[]): SelectOption[] =>
   items.map((s) => ({ value: s.id, label: `${s.code} – ${s.name}` }));

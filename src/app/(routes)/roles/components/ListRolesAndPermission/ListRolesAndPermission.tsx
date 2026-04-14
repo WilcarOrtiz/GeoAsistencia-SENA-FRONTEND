@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Permission } from "@/features/roleAndPermission/roleAndPermission.type";
 import { PermissionMatrix } from "../PermissionMatrix/PermissionMatrix";
 import { Pagination } from "@/components/shared/Pagination";
-import { useRoles } from "@/hooks/Roles";
+import { useRoles } from "@/hooks/ApiList";
 
 export default function ListRolesAndPermission() {
   const [data, setData] = useState<Permission[]>([]);
@@ -21,7 +21,7 @@ export default function ListRolesAndPermission() {
 
   const totalPages = Math.ceil(total / LIMIT);
 
-  const { roles, loading: loadingRoles } = useRoles();
+  const { data: roles, loading: loadingRoles } = useRoles();
 
   useEffect(() => {
     const fetch = async () => {

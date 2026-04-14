@@ -145,11 +145,11 @@ body,
 
   /*Span indicador de si esta activo o no */
   --status-active: oklch(0.7 0.18 145);
---status-inactive: oklch(59.443% 0.24294 355.261);
+  --status-inactive: oklch(59.443% 0.24294 355.261);
 
 }
 
-/* global.css o tu archivo de estilos */
+
 .badge-soft {
   /* Usamos el color de la variante como texto */
   color: var(--primary-foreground); 
@@ -235,3 +235,5 @@ body,
     @apply underline-offset-4 hover:underline;
   }
 }
+
+

@@ -4,6 +4,7 @@ export interface ClassGroup {
   name: string;
   academic_year: number;
   max_students: number;
+  total_students: number;
   is_active: boolean;
   created_at: Date;
 

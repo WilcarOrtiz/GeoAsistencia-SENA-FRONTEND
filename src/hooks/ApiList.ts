@@ -20,7 +20,8 @@ export function useApiList<T>(url: Key) {
   };
 }
 
-export const useSemesters = () => useApiList<SemesterBasic>("/semester/all");
+export const useSemesters = (type: "select" | "filter" = "select") =>
+  useApiList<SemesterBasic>(`/semester/all?type=${type}`);
 
 export const useSubject = () => useApiList<Subject>("/subjects/all");
 
