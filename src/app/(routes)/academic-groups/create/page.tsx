@@ -1,7 +1,7 @@
 import { PageHeader } from "@/components/shared/PageHeader";
 import { FormAcademicGroups } from "../components/FormAcademicGroup";
 
-export default function CreateUserPage() {
+export default function CreateAcademicGroupPage() {
   return (
     <div className="container mx-auto pt-4">
       <PageHeader

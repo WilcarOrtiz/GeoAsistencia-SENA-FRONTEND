@@ -40,7 +40,6 @@ export function useUsers(limit = 10) {
 
   const { data, isLoading, mutate } = useSWR(url, fetcher);
 
-  console.log("dataaaa: ", data?.data);
   //  Debounce solo para el email
   const debouncedEmail = useDebouncedCallback((value: string) => {
     setEmail(value);

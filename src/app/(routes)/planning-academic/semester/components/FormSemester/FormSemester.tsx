@@ -3,73 +3,21 @@
 import * as F from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { DatePicker } from "@/components/shared/DatePicker";
 import { SelectField } from "@/components/shared/SelectField";
-import { apiClient } from "@/lib/api/api_client";
-import { toast } from "sonner";
-import axios from "axios";
-import {
-  SEMESTER_STATES,
-  STATE_LABELS,
-} from "@/features/semester/semester.constants";
-import { FormSemesterProps } from "./FormSemester.type";
-
-const STATUS_OPTIONS = SEMESTER_STATES.map((state) => ({
-  value: state,
-  label: STATE_LABELS[state],
-}));
-
-const formSchema = z.object({
-  name: z.string().min(2),
-  startDate: z.date(),
-  endDate: z.date(),
-  state: z.enum(SEMESTER_STATES),
-});
+import { FormSemesterProps, STATUS_OPTIONS } from "./FormSemester.type";
+import { useFormSemester } from "./useFormSemester";
 
 export function FormSemester({
   semester,
   onSuccess,
   onClose,
 }: FormSemesterProps) {
-  const isEditing = !!semester;
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: semester?.name ?? "",
-      startDate: semester?.startDate ? new Date(semester.startDate) : undefined,
-      endDate: semester?.endDate ? new Date(semester.endDate) : undefined,
-      state: semester?.state ?? "active",
-    },
-  });
-
-  const { isValid } = form.formState;
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const res = isEditing
-        ? await apiClient.patch(`/semester/${semester.id}`, {
-            name: values.name,
-            startDate: values.startDate,
-            endDate: values.endDate,
-          })
-        : await apiClient.post("/semester", values);
-
-      if (res.ok) {
-        toast.success(res.message);
-        onSuccess?.();
-        onClose();
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.message ?? "Opps, algo anda mal";
-        toast.error(message, { position: "top-center" });
-      }
-    }
-  };
+  const { form, isEditing, isValid, onSubmit } = useFormSemester(
+    semester,
+    onSuccess,
+    onClose,
+  );
 
   return (
     <F.Form {...form}>

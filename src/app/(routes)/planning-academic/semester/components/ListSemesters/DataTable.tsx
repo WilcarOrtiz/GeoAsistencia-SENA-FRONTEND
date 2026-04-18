@@ -12,35 +12,10 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import * as T from "@/components/ui/table";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import {
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenu,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  SEMESTER_STATES,
-  STATE_LABELS,
-} from "@/features/semester/semester.constants";
 import { Pagination } from "@/components/shared/Pagination";
+import { DataTableFilters } from "./DataTableFilters";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -79,108 +54,54 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center gap-4 py-4">
-        <Input
-          placeholder="Filtrar por nombre..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-
-        <Select
-          value={(table.getColumn("state")?.getFilterValue() as string) ?? ""}
-          onValueChange={(value) =>
-            table
-              .getColumn("state")
-              ?.setFilterValue(value === "all" ? "" : value)
-          }
-        >
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Estado" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            {SEMESTER_STATES.map((state) => (
-              <SelectItem key={state} value={state}>
-                {STATE_LABELS[state]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columnas
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => (
-                <DropdownMenuCheckboxItem
-                  key={column.id}
-                  className="capitalize"
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                >
-                  {column.id}
-                </DropdownMenuCheckboxItem>
-              ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
+      <DataTableFilters table={table} />
       <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader>
+        <T.Table>
+          <T.TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <T.TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <T.TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
-                  </TableHead>
+                  </T.TableHead>
                 ))}
-              </TableRow>
+              </T.TableRow>
             ))}
-          </TableHeader>
-          <TableBody>
+          </T.TableHeader>
+          <T.TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
+                <T.TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <T.TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
-                    </TableCell>
+                    </T.TableCell>
                   ))}
-                </TableRow>
+                </T.TableRow>
               ))
             ) : (
-              <TableRow>
-                <TableCell
+              <T.TableRow>
+                <T.TableCell
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
                   No results.
-                </TableCell>
-              </TableRow>
+                </T.TableCell>
+              </T.TableRow>
             )}
-          </TableBody>
-        </Table>
+          </T.TableBody>
+        </T.Table>
       </div>
 
       <Pagination

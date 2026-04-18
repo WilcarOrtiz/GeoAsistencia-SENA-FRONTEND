@@ -2,18 +2,10 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-type Props = {
-  id: string;
-  code: string;
-  name: string;
-  subject: string;
-  semester: string;
-  teacher: string;
-  total_students: number;
-  max_students: number;
-  is_active: boolean;
-};
+import * as DM from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal, Pencil, RefreshCw } from "lucide-react";
+import { Props } from "./ClassGroupCard.type";
 
 export function ClassGroupCard({
   id,
@@ -24,7 +16,9 @@ export function ClassGroupCard({
   teacher,
   total_students,
   max_students,
+  total_sessions,
   is_active,
+  onEdit,
 }: Props) {
   const percentage = (total_students / max_students) * 100;
 
@@ -32,13 +26,15 @@ export function ClassGroupCard({
     <Card className="rounded-2xl shadow-sm border p-4 space-y-4">
       <CardContent className="p-0 space-y-4">
         {/* Header */}
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-start relative">
           <div>
-            <p className="text-xs text-muted-foreground">ID: #{id}</p>
+            <p className="text-xs text-muted-foreground">
+              {total_sessions} sesiones
+            </p>
             <h2 className="text-xl font-semibold leading-tight">{name}</h2>
           </div>
 
-          <div className="text-right space-y-1">
+          <div className="flex items-center gap-2 justify-end">
             <Badge
               variant="secondary"
               className={
@@ -50,7 +46,24 @@ export function ClassGroupCard({
               {is_active ? "ACTIVE" : "INACTIVE"}
             </Badge>
 
-            <p className="text-primary font-semibold">{code}</p>
+            <DM.DropdownMenu>
+              <DM.DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DM.DropdownMenuTrigger>
+              <DM.DropdownMenuContent align="end">
+                <DM.DropdownMenuLabel>Acciones</DM.DropdownMenuLabel>
+                <DM.DropdownMenuItem onClick={() => onEdit("basic")}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Editar información
+                </DM.DropdownMenuItem>
+                <DM.DropdownMenuItem onClick={() => onEdit("schedule")}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Editar horarios
+                </DM.DropdownMenuItem>
+              </DM.DropdownMenuContent>
+            </DM.DropdownMenu>
           </div>
         </div>
 
@@ -68,7 +81,9 @@ export function ClassGroupCard({
           </div>
 
           <div className="text-right">
-            <p className="text-xs text-muted-foreground">ENROLLMENT</p>
+            <p className="text-xs text-muted-foreground">
+              Alumnos Matriculados
+            </p>
             <p className="font-semibold">
               {total_students} / {max_students}
             </p>

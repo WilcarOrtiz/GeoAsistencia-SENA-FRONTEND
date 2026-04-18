@@ -19,21 +19,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-
 import { Pagination } from "@/components/shared/Pagination";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  ROLE_LABELS,
-  ROLE_SYSTEM_KEYS,
-} from "@/features/roleAndPermission/role.constants";
-import { GenericSelect } from "@/components/shared/select";
+import { UserTableFilters } from "./UserTableFilters";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -81,52 +68,14 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-end gap-3 py-4">
-        <div className="flex flex-col gap-1">
-          <span className="text-xs text-muted-foreground">Correo</span>
-          <Input
-            placeholder="Filtrar correo..."
-            value={emailInput}
-            onChange={(e) => onEmailChange(e.target.value)}
-            className="w-full sm:w-[240px]"
-          />
-        </div>
-
-        <div className="flex gap-3 flex-col xs:flex-row sm:flex-row">
-          {/* Filtro según rol */}
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-muted-foreground">Rol</span>
-
-            <GenericSelect
-              options={[
-                { label: "Todos", value: "all" },
-                ...ROLE_SYSTEM_KEYS.map((roleKey) => ({
-                  label: ROLE_LABELS[roleKey],
-                  value: roleKey,
-                })),
-              ]}
-              defaultValue={role || "all"} // 👈 controlado
-              onSelect={onRoleChange}
-              placeholder="Todos los roles"
-            />
-          </div>
-
-          {/* Filtro de estado */}
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-muted-foreground">Estado</span>
-            <Select value={isActive || "all"} onValueChange={onIsActiveChange}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Todos" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="true">Activos</SelectItem>
-                <SelectItem value="false">Inactivos</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
+      <UserTableFilters
+        emailInput={emailInput}
+        role={role}
+        isActive={isActive}
+        onEmailChange={onEmailChange}
+        onRoleChange={onRoleChange}
+        onIsActiveChange={onIsActiveChange}
+      />
 
       <div className="overflow-hidden rounded-md border">
         <Table>

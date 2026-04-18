@@ -17,3 +17,7 @@ export const WeekDayLabel: Record<WeekDay, string> = {
   [WeekDay.FRIDAY]: "Viernes",
   [WeekDay.SATURDAY]: "Sábado",
 };
+
+export const days = Object.values(WeekDay).filter(
+  (v) => typeof v === "number",
+) as WeekDay[];

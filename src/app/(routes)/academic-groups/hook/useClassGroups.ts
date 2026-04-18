@@ -45,6 +45,13 @@ export function useAcademicGroup(limit = 10) {
     setPage(1);
   }, []);
 
+  const handleEdit = useCallback(
+    (group: ClassGroup, type: "basic" | "schedule") => {
+      router.push(`/academic-groups/${group.id}/edit?mode=${type}`); // ← /edit
+    },
+    [router],
+  );
+
   // URL dinámica
   const url = useMemo(() => {
     const params = new URLSearchParams();
@@ -54,9 +61,6 @@ export function useAcademicGroup(limit = 10) {
     if (term) params.set("term", term);
     if (semester) params.set("semester", semester);
     if (subject) params.set("subject", subject);
-
-    console.log(params.toString());
-
     return `/class-groups?${params.toString()}`;
   }, [page, limit, term, semester, subject]);
 
@@ -66,12 +70,6 @@ export function useAcademicGroup(limit = 10) {
     router.push("/academic-groups/create");
   }, [router]);
 
-  const handleEdit = useCallback(
-    (group: ClassGroup) => {
-      router.push(`/academic-groups/${group.id}`);
-    },
-    [router],
-  );
   return useMemo(
     () => ({
       groups: data?.data ?? [],

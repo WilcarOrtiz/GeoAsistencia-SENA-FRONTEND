@@ -53,8 +53,6 @@ export interface GenericSelectProps {
   className?: string;
 }
 
-// ── Componente ────────────────────────────────────────────────────────────────
-
 export function GenericSelect({
   options,
   onSelect,

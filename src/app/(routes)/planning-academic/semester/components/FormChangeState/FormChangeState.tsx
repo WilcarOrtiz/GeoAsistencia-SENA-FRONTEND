@@ -9,29 +9,11 @@ import * as z from "zod";
 import { apiClient } from "@/lib/api/api_client";
 import { toast } from "sonner";
 import axios from "axios";
-import { Semester, SemesterState } from "@/features/semester/semester.type";
 import { STATE_LABELS } from "@/features/semester/semester.constants";
+import { formSchema, Props, VALID_TRANSITIONS } from "./FormChangeState.schema";
 
-const VALID_TRANSITIONS: Record<SemesterState, SemesterState[]> = {
-  planned: ["active", "canceled"],
-  active: ["finished", "canceled"],
-  finished: [],
-  canceled: [],
-};
-
-const formSchema = z.object({
-  state: z.string().min(1),
-});
-
-type FormChangeStateProps = {
-  semester: Semester;
-  onSuccess?: () => void;
-  onClose: () => void;
-};
-
-export function FormChangeState({ semester, onSuccess, onClose }: FormChangeStateProps) {
+export function FormChangeState({ semester, onSuccess, onClose }: Props) {
   const nextStates = VALID_TRANSITIONS[semester.state];
-
   const options = nextStates.map((state) => ({
     value: state,
     label: STATE_LABELS[state],
