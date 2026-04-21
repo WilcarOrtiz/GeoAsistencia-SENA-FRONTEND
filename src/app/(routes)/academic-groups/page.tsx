@@ -21,6 +21,7 @@ export default function AcademicGroupPage() {
     handleSemesterFilter,
     handleSubjectFilter,
     handleEdit,
+    handleDetails,
 
     handleCreate,
   } = useAcademicGroup();
@@ -45,6 +46,7 @@ export default function AcademicGroupPage() {
           onSemesterChange={handleSemesterFilter}
           onSubjectChange={handleSubjectFilter}
           onEdit={handleEdit}
+          onDetails={handleDetails}
         />
       </div>
     </div>

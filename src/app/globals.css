@@ -57,8 +57,9 @@ body,
     --color-success: var(--success);
     --color-success-foreground: var(--success-foreground);
 
+    
     --color-status-active: var(--status-active);
---color-status-inactive: var(--status-inactive);
+    --color-status-inactive: var(--status-inactive);
 }
 
 :root {
@@ -103,7 +104,7 @@ body,
 
    /*Span indicador de si esta activo o no */
   --status-active: oklch(0.72 0.16 145);
---status-inactive: oklch(66.991% 0.17138 51.923);
+  --status-inactive: oklch(66.991% 0.17138 51.923);
 }
 
 .dark {

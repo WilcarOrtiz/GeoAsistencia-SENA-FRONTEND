@@ -19,11 +19,15 @@ export function ClassGroupCard({
   total_sessions,
   is_active,
   onEdit,
+  onDetails,
 }: Props) {
   const percentage = (total_students / max_students) * 100;
 
   return (
-    <Card className="rounded-2xl shadow-sm border p-4 space-y-4">
+    <Card
+      onDoubleClick={() => onDetails()}
+      className="rounded-2xl shadow-sm border p-4 space-y-4"
+    >
       <CardContent className="p-0 space-y-4">
         {/* Header */}
         <div className="flex justify-between items-start relative">
@@ -35,19 +39,15 @@ export function ClassGroupCard({
           </div>
 
           <div className="flex items-center gap-2 justify-end">
-            <Badge
-              variant="secondary"
-              className={
-                is_active
-                  ? "bg-green-100 text-green-700"
-                  : "bg-gray-200 text-gray-600"
-              }
-            >
+            <Badge variant={is_active ? "success" : "inactive"}>
               {is_active ? "ACTIVE" : "INACTIVE"}
             </Badge>
 
             <DM.DropdownMenu>
-              <DM.DropdownMenuTrigger asChild>
+              <DM.DropdownMenuTrigger
+                onClick={(e) => e.stopPropagation()}
+                asChild
+              >
                 <Button variant="ghost" className="h-8 w-8 p-0">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>

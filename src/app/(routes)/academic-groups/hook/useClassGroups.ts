@@ -47,7 +47,14 @@ export function useAcademicGroup(limit = 10) {
 
   const handleEdit = useCallback(
     (group: ClassGroup, type: "basic" | "schedule") => {
-      router.push(`/academic-groups/${group.id}/edit?mode=${type}`); // ← /edit
+      router.push(`/academic-groups/${group.id}/edit?mode=${type}`);
+    },
+    [router],
+  );
+
+  const handleDetails = useCallback(
+    (group: ClassGroup) => {
+      router.push(`/academic-groups/${group.id}/details`);
     },
     [router],
   );
@@ -88,6 +95,7 @@ export function useAcademicGroup(limit = 10) {
 
       handleCreate,
       handleEdit,
+      handleDetails,
 
       isLoading: !data && (isLoading || isValidating),
       isFetching: isValidating,
@@ -104,6 +112,7 @@ export function useAcademicGroup(limit = 10) {
       handleSubjectFilter,
       handleCreate,
       handleEdit,
+      handleDetails,
       isLoading,
       isValidating,
     ],

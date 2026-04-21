@@ -20,6 +20,7 @@ interface Props {
   onSubjectChange: (value: string) => void;
   isLoading: boolean;
   onEdit: (group: ClassGroup, type: "basic" | "schedule") => void;
+  onDetails: (group: ClassGroup) => void;
 }
 
 export function ClassGroupList({
@@ -47,6 +48,7 @@ export function ClassGroupList({
 
       <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <ClassGroupGrid
+          onDetails={filterProps.onDetails}
           data={data}
           isLoading={filterProps.isLoading}
           onEdit={filterProps.onEdit}

@@ -1,3 +1,4 @@
+import { ClassGroup } from "../../../../../features/classGroup/ClassGroup.type";
 export type Props = {
   id: string;
   code: string;
@@ -10,4 +11,5 @@ export type Props = {
   is_active: boolean;
   total_sessions: number;
   onEdit: (type: "basic" | "schedule") => void;
+  onDetails: () => void;
 };

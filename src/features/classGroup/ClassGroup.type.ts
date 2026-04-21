@@ -32,3 +32,9 @@ export interface ClassDay {
   day: number;
   is_active: boolean;
 }
+
+export interface GroupedSchedule {
+  days: number[];
+  start_time: string;
+  end_time: string;
+}

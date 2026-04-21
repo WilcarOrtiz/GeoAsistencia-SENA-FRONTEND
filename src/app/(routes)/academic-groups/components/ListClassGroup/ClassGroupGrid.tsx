@@ -7,11 +7,12 @@ type Props = {
   data: ClassGroup[];
   isLoading: boolean;
   onEdit: (group: ClassGroup, type: "basic" | "schedule") => void;
+  onDetails: (group: ClassGroup) => void;
 };
 
 const SKELETON_COUNT = 6;
 
-export function ClassGroupGrid({ data, isLoading, onEdit }: Props) {
+export function ClassGroupGrid({ data, isLoading, onEdit, onDetails }: Props) {
   if (isLoading && data.length === 0) {
     return (
       <>
@@ -46,6 +47,7 @@ export function ClassGroupGrid({ data, isLoading, onEdit }: Props) {
           max_students={group.max_students ?? 0}
           is_active={group.is_active}
           onEdit={(type) => onEdit(group, type)}
+          onDetails={() => onDetails(group)}
         />
       ))}
     </>
