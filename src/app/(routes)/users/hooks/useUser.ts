@@ -4,43 +4,42 @@ import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { apiClient } from "@/lib/api/api_client";
 import { PaginatedData } from "@/types/api";
-import useSWR from "swr";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { User } from "@/features/User/user.type";
 import { useDebouncedCallback } from "use-debounce";
 import { sendRecoveryEmail } from "@/actions/auth/auth";
 import { toast } from "sonner";
 
-const fetcher = async (url: string) => {
-  const { data } = await apiClient.get<PaginatedData<User>>(url);
-  return data;
-};
-
 export function useUsers(limit = 10) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
 
-  //  Estados de filtros
   const [emailInput, setEmailInput] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [isActive, setIsActive] = useState("");
 
-  //  URL dinámica con los filtros
-  const url = useMemo(() => {
+  const queryParams = useMemo(() => {
     const params = new URLSearchParams();
     params.set("page", String(page));
     params.set("limit", String(limit));
     if (email) params.set("email", email);
     if (role) params.set("role", role);
     if (isActive) params.set("is_active", isActive);
-    const built = `/user?${params.toString()}`;
-    console.log("URL generada:", built);
-    return `/user?${params.toString()}`;
+    return params;
   }, [page, limit, email, role, isActive]);
 
-  const { data, isLoading, mutate } = useSWR(url, fetcher);
+  const url = `/user?${queryParams.toString()}`;
 
-  //  Debounce solo para el email
+  const { data, isLoading } = useQuery({
+    queryKey: ["users", page, limit, email, role, isActive],
+    queryFn: async () => {
+      const { data } = await apiClient.get<PaginatedData<User>>(url);
+      return data;
+    },
+  });
+
   const debouncedEmail = useDebouncedCallback((value: string) => {
     setEmail(value);
     setPage(1);
@@ -54,7 +53,6 @@ export function useUsers(limit = 10) {
     [debouncedEmail],
   );
 
-  // 👇 Rol y estado cambian inmediato (son selects, no hay que debouncear)
   const handleRoleFilter = useCallback((value: string) => {
     setRole(value === "all" ? "" : value);
     setPage(1);
@@ -84,7 +82,7 @@ export function useUsers(limit = 10) {
       } else {
         toast.error(res.message, { position: "top-center" });
       }
-    } catch (error) {
+    } catch {
       toast.error("No se pudo enviar el correo de recuperación");
     }
   }, []);
@@ -97,13 +95,13 @@ export function useUsers(limit = 10) {
           : await apiClient.patch(`/user/${user.auth_id}/activate`);
 
         if (res.ok) {
-          await mutate();
+          await queryClient.invalidateQueries({ queryKey: ["users"] });
         }
       } catch (error) {
         console.error("Error cambiando estado:", error);
       }
     },
-    [mutate],
+    [queryClient],
   );
 
   return useMemo(
@@ -118,7 +116,6 @@ export function useUsers(limit = 10) {
       handleSendRecoveryEmail,
       handleEdit,
       handleChangeState,
-      // 👇 Filtros
       emailInput,
       role,
       isActive,

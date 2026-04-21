@@ -10,6 +10,7 @@ import { apiClient } from "@/lib/api/api_client";
 import { toast } from "sonner";
 import axios from "axios";
 import { FormSubjectProps } from "./FormSubject.type";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
   name: z.string().min(3).max(30),
@@ -18,6 +19,7 @@ const formSchema = z.object({
 
 export function FormSubject({ subject, onSuccess, onClose }: FormSubjectProps) {
   const isEditing = !!subject;
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -27,28 +29,34 @@ export function FormSubject({ subject, onSuccess, onClose }: FormSubjectProps) {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const res = isEditing
-        ? await apiClient.patch(`/subjects/${subject.id}`, values)
-        : await apiClient.post("/subjects", values);
+  const { mutate: submitSubject, isPending } = useMutation({
+    mutationFn: (values: z.infer<typeof formSchema>) =>
+      isEditing
+        ? apiClient.patch(`/subjects/${subject.id}`, values)
+        : apiClient.post("/subjects", values),
 
-      if (res.ok) {
-        toast.success(res.message);
-        onSuccess?.();
-        onClose();
-      }
-    } catch (error) {
+    onSuccess: (res) => {
+      toast.success(res.message);
+      queryClient.invalidateQueries({ queryKey: ["subjects"] }); // ← refresca el listado
+      onSuccess?.();
+      onClose();
+    },
+
+    onError: (error) => {
       if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.message ?? "Opps, algo anda mal";
-        toast.error(message, { position: "top-center" });
+        toast.error(error.response?.data?.message ?? "Opps, algo anda mal", {
+          position: "top-center",
+        });
       }
-    }
-  };
+    },
+  });
 
   return (
     <F.Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit((values) => submitSubject(values))}
+        className="space-y-6"
+      >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <F.FormField
@@ -78,7 +86,7 @@ export function FormSubject({ subject, onSuccess, onClose }: FormSubjectProps) {
                   <F.FormLabel>Nombre</F.FormLabel>
                   <F.FormControl>
                     <Input
-                      placeholder="Ej: Ingenieria de sotware I"
+                      placeholder="Ej: Ingenieria de software I"
                       {...field}
                     />
                   </F.FormControl>
@@ -92,8 +100,9 @@ export function FormSubject({ subject, onSuccess, onClose }: FormSubjectProps) {
           </div>
         </div>
 
-        <Button type="submit" className="w-full sm:w-auto">
-          Guardar
+        {/* isPending deshabilita el botón mientras guarda */}
+        <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
+          {isPending ? "Guardando..." : "Guardar"}
         </Button>
       </form>
     </F.Form>

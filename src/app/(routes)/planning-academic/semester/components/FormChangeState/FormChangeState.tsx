@@ -11,8 +11,10 @@ import { toast } from "sonner";
 import axios from "axios";
 import { STATE_LABELS } from "@/features/semester/semester.constants";
 import { formSchema, Props, VALID_TRANSITIONS } from "./FormChangeState.schema";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function FormChangeState({ semester, onSuccess, onClose }: Props) {
+  const queryClient = useQueryClient();
   const nextStates = VALID_TRANSITIONS[semester.state];
   const options = nextStates.map((state) => ({
     value: state,
@@ -24,25 +26,28 @@ export function FormChangeState({ semester, onSuccess, onClose }: Props) {
     defaultValues: { state: "" },
   });
 
-  const { isValid } = form.formState;
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const res = await apiClient.patch(`/semester/${semester.id}/state`, {
+  const { mutate: changeState, isPending } = useMutation({
+    mutationFn: (values: z.infer<typeof formSchema>) =>
+      apiClient.patch(`/semester/${semester.id}/state`, {
         state: values.state,
-      });
-      if (res.ok) {
-        toast.success(res.message);
-        onSuccess?.();
-        onClose();
-      }
-    } catch (error) {
+      }),
+
+    onSuccess: (res) => {
+      toast.success(res.message);
+      // invalida semesters para que el listado se refresque
+      queryClient.invalidateQueries({ queryKey: ["semesters"] });
+      onSuccess?.();
+      onClose();
+    },
+
+    onError: (error) => {
       if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.message ?? "Opps, algo anda mal";
-        toast.error(message, { position: "top-center" });
+        toast.error(error.response?.data?.message ?? "Opps, algo anda mal", {
+          position: "top-center",
+        });
       }
-    }
-  };
+    },
+  });
 
   if (nextStates.length === 0) {
     return (
@@ -54,7 +59,10 @@ export function FormChangeState({ semester, onSuccess, onClose }: Props) {
 
   return (
     <F.Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form
+        onSubmit={form.handleSubmit((values) => changeState(values))}
+        className="space-y-4"
+      >
         <p className="text-sm text-muted-foreground">
           Estado actual:{" "}
           <span className="font-medium">{STATE_LABELS[semester.state]}</span>
@@ -79,8 +87,12 @@ export function FormChangeState({ semester, onSuccess, onClose }: Props) {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={!isValid}>
-          Confirmar cambio
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={!form.formState.isValid || isPending}
+        >
+          {isPending ? "Guardando..." : "Confirmar cambio"}
         </Button>
       </form>
     </F.Form>

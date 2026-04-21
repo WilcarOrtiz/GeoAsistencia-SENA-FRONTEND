@@ -1,4 +1,3 @@
-import { ClassGroup } from "../../../../../features/classGroup/ClassGroup.type";
 export type Props = {
   id: string;
   code: string;

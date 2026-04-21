@@ -7,7 +7,7 @@ import * as z from "zod";
 import { apiClient } from "@/lib/api/api_client";
 import { toast } from "sonner";
 import axios from "axios";
-import { mutate } from "swr";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 const formSchema = z.object({
@@ -27,6 +27,7 @@ const formSchema = z.object({
 
 export function useUserForm(user: FormUserProps["user"]) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const isEditing = !!user;
 
   const { data: roles, loading } = useRoles();
@@ -89,7 +90,11 @@ export function useUserForm(user: FormUserProps["user"]) {
         });
       }
 
-      mutate((key) => typeof key === "string" && key.startsWith("/user"));
+      // Invalida todas las queries que empiecen con "users" o el user específico
+      await queryClient.invalidateQueries({ queryKey: ["users"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["user", user?.auth_id],
+      });
       router.push("/users");
     } catch (error) {
       if (axios.isAxiosError(error)) {

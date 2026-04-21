@@ -11,7 +11,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api/api_client";
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Permission,
   Role,
@@ -24,51 +24,72 @@ import {
 interface Props {
   permissions: Permission[];
   roles: Role[];
-  onPermissionsChange: (permissions: Permission[]) => void;
+  page: number;
 }
 
-export function PermissionMatrix({
-  permissions,
-  roles,
-  onPermissionsChange,
-}: Props) {
-  const [toggling, setToggling] = useState<string | null>(null);
+export function PermissionMatrix({ permissions, roles, page }: Props) {
+  const queryClient = useQueryClient();
+  const LIMIT = 14;
 
-  const hasRole = (p: Permission, roleId: string) =>
-    p.roles.some((r) => r.id === roleId);
+  const { mutate: togglePermission, variables } = useMutation({
+    mutationFn: ({
+      permission,
+      role,
+      checked,
+    }: {
+      permission: Permission;
+      role: Role;
+      checked: boolean;
+    }) =>
+      checked
+        ? apiClient.patch(`/role/${role.id}/permissions/${permission.id}/add`)
+        : apiClient.patch(
+            `/role/${role.id}/permissions/${permission.id}/remove`,
+          ),
 
-  const toggle = async (p: Permission, role: Role, checked: boolean) => {
-    const key = `${p.id}-${role.id}`;
-    setToggling(key);
-    try {
-      if (checked) {
-        await apiClient.patch(`/role/${role.id}/permissions/${p.id}/add`);
-      } else {
-        await apiClient.patch(`/role/${role.id}/permissions/${p.id}/remove`);
-      }
-
-      const updated = permissions.map((perm) => {
-        if (perm.id !== p.id) return perm;
-        return {
-          ...perm,
-          roles: checked
-            ? [...perm.roles, role]
-            : perm.roles.filter((r) => r.id !== role.id),
-        };
+    onMutate: async ({ permission, role, checked }) => {
+      await queryClient.cancelQueries({
+        queryKey: ["permissions-matrix", page],
       });
 
-      onPermissionsChange(updated);
+      const previous = queryClient.getQueryData(["permissions-matrix", page]);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      queryClient.setQueryData(["permissions-matrix", page], (old: any) => ({
+        ...old,
+        data: old.data.map((p: Permission) => {
+          if (p.id !== permission.id) return p;
+          return {
+            ...p,
+            roles: checked
+              ? [...p.roles, role]
+              : p.roles.filter((r) => r.id !== role.id),
+          };
+        }),
+      }));
+
+      return { previous };
+    },
+
+    onError: (_, __, context) => {
+      queryClient.setQueryData(["permissions-matrix", page], context?.previous);
+      toast.error("Error al actualizar permiso");
+    },
+
+    onSuccess: (_, { role, checked }) => {
       toast.success(
         checked
           ? `Asignado a ${ROLE_LABELS[role.name as RoleSystem]}`
           : `Removido de ${ROLE_LABELS[role.name as RoleSystem]}`,
       );
-    } catch {
-      toast.error("Error al actualizar permiso");
-    } finally {
-      setToggling(null);
-    }
-  };
+    },
+  });
+
+  const hasRole = (p: Permission, roleId: string) =>
+    p.roles.some((r) => r.id === roleId);
+
+  const isToggling = (permId: string, roleId: string) =>
+    variables?.permission.id === permId && variables?.role.id === roleId;
 
   return (
     <div className="rounded-md border">
@@ -95,8 +116,14 @@ export function PermissionMatrix({
                 <TableCell key={r.id} className="text-center">
                   <Checkbox
                     checked={hasRole(p, r.id)}
-                    disabled={toggling === `${p.id}-${r.id}`}
-                    onCheckedChange={(checked) => toggle(p, r, !!checked)}
+                    disabled={isToggling(p.id, r.id)}
+                    onCheckedChange={(checked) =>
+                      togglePermission({
+                        permission: p,
+                        role: r,
+                        checked: !!checked,
+                      })
+                    }
                   />
                 </TableCell>
               ))}

@@ -6,6 +6,7 @@ import * as z from "zod";
 import { apiClient } from "@/lib/api/api_client";
 import { toast } from "sonner";
 import axios from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useFormSemester(
   semester: FormSemesterProps["semester"],
@@ -13,6 +14,7 @@ export function useFormSemester(
   onClose?: () => void,
 ) {
   const isEditing = !!semester;
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -24,35 +26,37 @@ export function useFormSemester(
     },
   });
 
-  const { isValid } = form.formState;
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const res = isEditing
-        ? await apiClient.patch(`/semester/${semester!.id}`, {
+  const { mutate: submitSemester, isPending } = useMutation({
+    mutationFn: (values: z.infer<typeof formSchema>) =>
+      isEditing
+        ? apiClient.patch(`/semester/${semester!.id}`, {
             name: values.name,
             startDate: values.startDate,
             endDate: values.endDate,
           })
-        : await apiClient.post("/semester", values);
+        : apiClient.post("/semester", values),
 
-      if (res.ok) {
-        toast.success(res.message);
-        onSuccess?.();
-        onClose?.();
-      }
-    } catch (error) {
+    onSuccess: (res) => {
+      toast.success(res.message);
+      queryClient.invalidateQueries({ queryKey: ["semesters"] });
+      onSuccess?.();
+      onClose?.();
+    },
+
+    onError: (error) => {
       if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.message ?? "Opps, algo anda mal";
-        toast.error(message, { position: "top-center" });
+        toast.error(error.response?.data?.message ?? "Opps, algo anda mal", {
+          position: "top-center",
+        });
       }
-    }
-  };
+    },
+  });
 
   return {
     form,
     isEditing,
-    isValid,
-    onSubmit,
+    isValid: form.formState.isValid,
+    isPending,
+    onSubmit: form.handleSubmit((values) => submitSemester(values)),
   };
 }

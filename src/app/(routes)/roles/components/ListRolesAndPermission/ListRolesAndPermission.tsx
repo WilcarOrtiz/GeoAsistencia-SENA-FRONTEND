@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/api_client";
 import { PaginatedData } from "@/types/api";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
@@ -10,45 +11,35 @@ import { PermissionMatrix } from "../PermissionMatrix/PermissionMatrix";
 import { Pagination } from "@/components/shared/Pagination";
 import { useRoles } from "@/hooks/ApiList";
 
+const LIMIT = 14;
+
 export default function ListRolesAndPermission() {
-  const [data, setData] = useState<Permission[]>([]);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  const LIMIT = 14;
-
-  const totalPages = Math.ceil(total / LIMIT);
 
   const { data: roles, loading: loadingRoles } = useRoles();
 
-  useEffect(() => {
-    const fetch = async () => {
-      setLoading(true);
-      try {
-        const permRes = await apiClient.get<PaginatedData<Permission>>(
-          `/permissions/matrix?page=${page}&limit=${LIMIT}`,
-        );
+  const { data, isLoading } = useQuery<PaginatedData<Permission>>({
+    queryKey: ["permissions-matrix", page],
+    queryFn: () =>
+      apiClient
+        .get<
+          PaginatedData<Permission>
+        >(`/permissions/matrix?page=${page}&limit=${LIMIT}`)
+        .then((res) => res.data),
+  });
 
-        setData(permRes.data.data);
-        setTotal(permRes.data.total);
-      } catch {
-        console.error("Error al cargar");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetch();
-  }, [page]);
+  const permissions = data?.data ?? [];
+  const total = data?.total ?? 0;
+  const totalPages = Math.ceil(total / LIMIT);
 
-  const filtered = data.filter(
+  const filtered = permissions.filter(
     (p) =>
       p.description.toLowerCase().includes(search.toLowerCase()) ||
       p.name.toLowerCase().includes(search.toLowerCase()),
   );
 
-  if (loading || loadingRoles) return <TableSkeleton />;
+  if (isLoading || loadingRoles) return <TableSkeleton />;
 
   return (
     <div className="container mx-auto py-10 space-y-4">
@@ -58,14 +49,11 @@ export default function ListRolesAndPermission() {
         onChange={(e) => setSearch(e.target.value)}
         className="max-w-sm"
       />
-
       <PermissionMatrix
         permissions={filtered}
         roles={roles}
-        onPermissionsChange={setData}
+        page={page} // ← pasar page para que el cache coincida
       />
-
-      {/* Paginación */}
       <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );

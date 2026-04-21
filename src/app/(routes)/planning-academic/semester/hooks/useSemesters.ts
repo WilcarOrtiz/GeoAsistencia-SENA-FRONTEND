@@ -1,116 +1,105 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Semester } from "@/features/semester/semester.type";
 import { apiClient } from "@/lib/api/api_client";
 import { PaginatedData } from "@/types/api";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
-import useSWR from "swr";
 
 type ModalType = "create" | "edit" | "changeState" | "delete" | null;
-
 interface ModalState {
   type: ModalType;
   semester?: Semester;
 }
 
-const fetcher = async (url: string) => {
-  const { data } = await apiClient.get<PaginatedData<Semester>>(url);
-  return data;
-};
-
 export function useSemesters(limit = 10) {
   const [page, setPage] = useState(1);
   const [modal, setModal] = useState<ModalState>({ type: null });
+  const queryClient = useQueryClient();
 
-  const { data, isLoading, mutate } = useSWR(
-    `/semester?page=${page}&limit=${limit}`,
-    fetcher,
-  );
+  const { data, isLoading } = useQuery<PaginatedData<Semester>>({
+    queryKey: ["semesters", page, limit],
+    queryFn: () =>
+      apiClient
+        .get<PaginatedData<Semester>>(`/semester?page=${page}&limit=${limit}`)
+        .then((res) => res.data),
+  });
 
   const openModal = useCallback((type: ModalType, semester?: Semester) => {
     setModal({ type, semester });
   }, []);
 
-  const closeModal = useCallback(() => {
-    setModal({ type: null });
-  }, []);
+  const closeModal = useCallback(() => setModal({ type: null }), []);
 
-  const handleDelete = useCallback(async () => {
-    if (!modal.semester?.id) return;
+  const { mutate: deleteSemester } = useMutation({
+    mutationFn: (id: string) => apiClient.delete(`/semester/${id}`),
 
-    const id = modal.semester.id;
+    onMutate: async (id) => {
+      // 1. Cancelar queries en vuelo
+      await queryClient.cancelQueries({ queryKey: ["semesters"] });
 
-    // 🔥 1. Actualización optimista (INMEDIATA)
-    mutate((currentData) => {
-      if (!currentData) return currentData;
+      // 2. Snapshot para rollback
+      const previous = queryClient.getQueryData(["semesters", page, limit]);
 
-      return {
-        ...currentData,
-        data: currentData.data.filter((item) => item.id !== id),
-        total: currentData.total - 1,
-      };
-    }, false); // ❗ sin refetch
+      // 3. Optimistic update
+      queryClient.setQueryData(
+        ["semesters", page, limit],
+        (old: PaginatedData<Semester>) => ({
+          ...old,
+          data: old.data.filter((item) => item.id !== id),
+          total: old.total - 1,
+        }),
+      );
 
-    try {
-      const res = await apiClient.delete(`/semester/${id}`);
+      return { previous };
+    },
 
-      toast.success("Acción realizada", {
-        description: res.message,
-        position: "top-center",
-      });
-
-      closeModal();
-    } catch (error) {
-      // 🔥 2. rollback si falla
-      mutate(); // aquí sí refetch
-
-      closeModal();
-
+    onError: (error, _, context) => {
+      // Rollback
+      queryClient.setQueryData(["semesters", page, limit], context?.previous);
       if (error instanceof AxiosError) {
         toast.error(
           error.response?.data?.message ?? "No se pudo eliminar el semestre",
         );
       }
-    }
-  }, [modal.semester, mutate, closeModal]);
+      closeModal();
+    },
+
+    onSuccess: (res) => {
+      toast.success("Acción realizada", {
+        description: res.message,
+        position: "top-center",
+      });
+      closeModal();
+    },
+
+    onSettled: () => {
+      // Siempre revalida al final
+      queryClient.invalidateQueries({ queryKey: ["semesters"] });
+    },
+  });
+
+  const handleDelete = useCallback(() => {
+    if (modal.semester?.id) deleteSemester(modal.semester.id);
+  }, [modal.semester, deleteSemester]);
 
   const refreshData = useCallback(() => {
-    mutate();
-  }, [mutate]);
+    queryClient.invalidateQueries({ queryKey: ["semesters"] });
+  }, [queryClient]);
 
-  return useMemo(
-    () => ({
-      // Data
-      semesters: data?.data ?? [],
-      total: data?.total ?? 0,
-      isLoading,
-
-      // Pagination
-      page,
-      limit,
-      setPage,
-
-      // Modal state
-      modal,
-      openModal,
-      closeModal,
-
-      // Actions
-      handleDelete,
-      refreshData,
-    }),
-    [
-      data,
-      isLoading,
-      page,
-      limit,
-      modal,
-      openModal,
-      closeModal,
-      handleDelete,
-      refreshData,
-    ],
-  );
+  return {
+    semesters: data?.data ?? [],
+    total: data?.total ?? 0,
+    isLoading,
+    page,
+    limit,
+    setPage,
+    modal,
+    openModal,
+    closeModal,
+    handleDelete,
+    refreshData,
+  };
 }
