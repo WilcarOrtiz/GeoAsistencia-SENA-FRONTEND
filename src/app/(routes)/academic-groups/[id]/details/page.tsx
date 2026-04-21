@@ -17,7 +17,6 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import { clsx } from "clsx";
 import { Button } from "@/components/ui/button";
 import { useClassSchedules } from "../../hook/useClassDays";
 import { WeekDay, WeekDayLabel } from "@/types/weekDay";
