@@ -17,6 +17,7 @@ import { AlertDialogDestructive } from "@/components/shared/AlertDialogDestructi
 import { FormSubject } from "./components/FormSubject";
 import { HeaderSubject } from "./components/HeaderSubject/HeaderSubject";
 import { useSubjects } from "./hooks";
+import { DownloadTemplateLink } from "@/components/shared/TemplateDownload";
 
 export default function SubjectPage() {
   const {
@@ -59,6 +60,12 @@ export default function SubjectPage() {
             onPageChange={setPage}
           />
         )}
+        <div className="mt-4">
+          <DownloadTemplateLink
+            endpoint="/subjects/bulk/template"
+            label="Asignaturas"
+          />
+        </div>
       </div>
 
       {/* Modal Crear/Editar */}

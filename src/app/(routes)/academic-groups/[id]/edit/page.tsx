@@ -5,22 +5,22 @@ import { FormAcademicGroups } from "../../components/FormAcademicGroup";
 import { ClassGroup } from "@/features/classGroup/ClassGroup.type";
 import { apiClient } from "@/lib/api/api_client";
 import { useParams, useSearchParams } from "next/navigation";
-import useSWR from "swr";
+import { useQuery } from "@tanstack/react-query";
 import { FormSkeleton } from "@/components/shared/FormSkeleton";
-
-const fetcher = async (url: string) => {
-  const { data } = await apiClient.get<ClassGroup>(url);
-  return data;
-};
 
 export default function UpdateAcademicGroupPage() {
   const { id } = useParams();
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode");
-  const { data: classGroup, isLoading } = useSWR(
-    `/class-groups/${id}`,
-    fetcher,
-  );
+
+  const { data: classGroup, isLoading } = useQuery<ClassGroup>({
+    queryKey: ["class-group", id],
+    queryFn: async () => {
+      const { data } = await apiClient.get<ClassGroup>(`/class-groups/${id}`);
+      return data;
+    },
+    enabled: !!id,
+  });
 
   if (isLoading) return <FormSkeleton fields={6} />;
 

@@ -6,6 +6,7 @@ import { DataTable } from "./components/ListUser/DataTable";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
 import { useUsers } from "./hooks";
 import { HeaderUserManagement } from "./components/HeaderUserManagement";
+import { DownloadTemplateLink } from "@/components/shared/TemplateDownload";
 
 export default function UserPage() {
   const {
@@ -55,6 +56,13 @@ export default function UserPage() {
             onIsActiveChange={handleIsActiveFilter}
           />
         )}
+        <div className="mt-4">
+          {" "}
+          <DownloadTemplateLink
+            endpoint="/user/bulk/template"
+            label="Usuarios"
+          />
+        </div>
       </div>
     </div>
   );

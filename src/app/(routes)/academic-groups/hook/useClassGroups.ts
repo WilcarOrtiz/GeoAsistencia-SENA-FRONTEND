@@ -4,14 +4,9 @@ import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { apiClient } from "@/lib/api/api_client";
 import { PaginatedData } from "@/types/api";
-import useSWR from "swr";
+import { useQuery } from "@tanstack/react-query";
 import { useDebouncedCallback } from "use-debounce";
 import { ClassGroup } from "@/features/classGroup/ClassGroup.type";
-
-const fetcher = async (url: string) => {
-  const { data } = await apiClient.get<PaginatedData<ClassGroup>>(url);
-  return data;
-};
 
 export function useAcademicGroup(limit = 10) {
   const router = useRouter();
@@ -59,19 +54,25 @@ export function useAcademicGroup(limit = 10) {
     [router],
   );
 
-  // URL dinámica
-  const url = useMemo(() => {
+  const queryParams = useMemo(() => {
     const params = new URLSearchParams();
     params.set("page", String(page));
     params.set("limit", String(limit));
-
     if (term) params.set("term", term);
     if (semester) params.set("semester", semester);
     if (subject) params.set("subject", subject);
-    return `/class-groups?${params.toString()}`;
+    return params;
   }, [page, limit, term, semester, subject]);
 
-  const { data, isLoading, isValidating, mutate } = useSWR(url, fetcher);
+  const { data, isLoading, isFetching } = useQuery<PaginatedData<ClassGroup>>({
+    queryKey: ["academic-groups", page, limit, term, semester, subject],
+    queryFn: async () => {
+      const { data } = await apiClient.get<PaginatedData<ClassGroup>>(
+        `/class-groups?${queryParams.toString()}`,
+      );
+      return data;
+    },
+  });
 
   const handleCreate = useCallback(() => {
     router.push("/academic-groups/create");
@@ -97,8 +98,8 @@ export function useAcademicGroup(limit = 10) {
       handleEdit,
       handleDetails,
 
-      isLoading: !data && (isLoading || isValidating),
-      isFetching: isValidating,
+      isLoading: isLoading && !data,
+      isFetching,
     }),
     [
       data,
@@ -114,7 +115,7 @@ export function useAcademicGroup(limit = 10) {
       handleEdit,
       handleDetails,
       isLoading,
-      isValidating,
+      isFetching,
     ],
   );
 }

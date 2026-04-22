@@ -1,6 +1,6 @@
 "use client";
 
-import useSWR from "swr";
+import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 
 import { apiClient } from "@/lib/api/api_client";
@@ -20,20 +20,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { useClassSchedules } from "../../hook/useClassDays";
 import { WeekDay, WeekDayLabel } from "@/types/weekDay";
-
-const fetcher = async (url: string) => {
-  const { data } = await apiClient.get<ClassGroup>(url);
-  return data;
-};
+import { DownloadTemplateLink } from "@/components/shared/TemplateDownload";
 
 export default function UpdateAcademicGroupPage() {
   const router = useRouter();
   const { id } = useParams();
 
-  const { data: classGroup, isLoading } = useSWR(
-    `/class-groups/${id}`,
-    fetcher,
-  );
+  const { data: classGroup, isLoading } = useQuery<ClassGroup>({
+    queryKey: ["class-group", id],
+    queryFn: async () => {
+      const { data } = await apiClient.get<ClassGroup>(`/class-groups/${id}`);
+      return data;
+    },
+    enabled: !!id,
+  });
+
   const { schedules } = useClassSchedules(id as string);
 
   if (isLoading) return <FormSkeleton fields={6} />;
@@ -42,6 +43,7 @@ export default function UpdateAcademicGroupPage() {
   const maxCapacity = classGroup!.max_students;
   const attendanceRate = 98.2;
   console.log("horarios: ", schedules);
+
   return (
     <div className="container mx-auto py-6 space-y-8">
       {/* HEADER */}
@@ -129,10 +131,8 @@ export default function UpdateAcademicGroupPage() {
 
       {/* LOWER SECTION */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Teacher (NOW STAT CARD STYLE) */}
         <Card className="hover:shadow-sm transition">
           <CardContent className="flex items-center justify-between">
-            {/* LEFT SIDE */}
             <div className="space-y-1">
               <p className="text-base font-semibold">Total de encuentros</p>
 
@@ -141,14 +141,12 @@ export default function UpdateAcademicGroupPage() {
               </p>
             </div>
 
-            {/* RIGHT SIDE (BIG NUMBER FULL HEIGHT) */}
             <span className="text-6xl font-bold tracking-tight leading-none">
               {classGroup?.total_sessions ?? 0}
             </span>
           </CardContent>
         </Card>
 
-        {/* Schedule (NO CARD LOOK, SOFT BLOCK) */}
         <div className="md:col-span-2 rounded-lg border bg-muted/30 p-4">
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs uppercase tracking-wide flex items-center gap-2">
@@ -165,12 +163,9 @@ export default function UpdateAcademicGroupPage() {
                   key={s.id}
                   className="flex justify-between py-1 border-b last:border-none"
                 >
-                  {/* DÍA */}
                   <span className="font-medium">
                     {WeekDayLabel[s.day as WeekDay]}
                   </span>
-
-                  {/* HORA */}
                   <span className="text-muted-foreground">
                     {s.start_time.slice(0, 5)} - {s.end_time.slice(0, 5)}
                   </span>
@@ -179,7 +174,15 @@ export default function UpdateAcademicGroupPage() {
           </div>
         </div>
       </div>
+      <div className="mt-4">
+        {" "}
+        <DownloadTemplateLink
+          endpoint="/enrollment/bulk/template"
+          label="Estudiantes"
+        />
+      </div>
     </div>
   );
 }
-//REVISAR QUE CUANDO ELIMINO UN HORARIO Y GUARDO ME SALE UN AVISO
+
+//TODO: REVISAR QUE CUANDO ELIMINO UN HORARIO Y GUARDO ME SALE UN AVISO

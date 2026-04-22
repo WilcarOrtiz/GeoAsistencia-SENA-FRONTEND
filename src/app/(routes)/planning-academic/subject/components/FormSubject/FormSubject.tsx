@@ -37,7 +37,7 @@ export function FormSubject({ subject, onSuccess, onClose }: FormSubjectProps) {
 
     onSuccess: (res) => {
       toast.success(res.message);
-      queryClient.invalidateQueries({ queryKey: ["subjects"] }); // ← refresca el listado
+      queryClient.invalidateQueries({ queryKey: ["subjects"] });
       onSuccess?.();
       onClose();
     },

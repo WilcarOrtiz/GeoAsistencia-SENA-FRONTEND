@@ -1,5 +1,5 @@
 import { ApiResponse } from "@/types";
-import { AxiosInstance } from "axios";
+import { AxiosInstance, AxiosRequestConfig } from "axios";
 
 export function createApiHelpers(axiosInstance: AxiosInstance) {
   return {
@@ -8,8 +8,21 @@ export function createApiHelpers(axiosInstance: AxiosInstance) {
       return response.data;
     },
 
-    post: async <T = unknown>(url: string, data?: unknown) => {
-      const response = await axiosInstance.post<ApiResponse<T>>(url, data);
+    getBlob: async (url: string) => {
+      const response = await axiosInstance.get(url, { responseType: "blob" });
+      return response.data as Blob;
+    },
+
+    post: async <T = unknown>(
+      url: string,
+      data?: unknown,
+      config?: AxiosRequestConfig,
+    ) => {
+      const response = await axiosInstance.post<ApiResponse<T>>(
+        url,
+        data,
+        config,
+      );
       return response.data;
     },
 

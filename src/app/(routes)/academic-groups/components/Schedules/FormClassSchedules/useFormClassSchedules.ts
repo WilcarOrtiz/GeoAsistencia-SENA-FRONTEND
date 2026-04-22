@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api/api_client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
   scheduleSchema,
@@ -13,6 +14,7 @@ import { useClassSchedules } from "../../../hook/useClassDays";
 
 export function useFormClassSchedules(grupoId: string) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { schedules } = useClassSchedules(grupoId);
 
   const form = useForm<ScheduleFormValues>({
@@ -38,11 +40,18 @@ export function useFormClassSchedules(grupoId: string) {
     );
   }, [schedules, replace]);
 
+  const { mutateAsync: deactivateSchedule } = useMutation({
+    mutationFn: (id: string) => apiClient.patch(`/class-days/${id}/deactivate`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["class-days", grupoId] });
+    },
+  });
+
   const handleRemove = async (index: number) => {
     const item = form.getValues(`schedules.${index}`);
 
     if (item?.id) {
-      await apiClient.patch(`/class-days/${item.id}/deactivate`);
+      await deactivateSchedule(item.id);
     }
 
     remove(index);
@@ -50,8 +59,8 @@ export function useFormClassSchedules(grupoId: string) {
 
   const handleAppend = () => append({ days: [], start_time: "", end_time: "" });
 
-  const onSubmit = async (values: ScheduleFormValues) => {
-    try {
+  const { mutateAsync: saveSchedules, isPending } = useMutation({
+    mutationFn: async (values: ScheduleFormValues) => {
       const validSchedules = values.schedules.filter(
         (s) =>
           !s.id &&
@@ -61,11 +70,10 @@ export function useFormClassSchedules(grupoId: string) {
       );
 
       if (!validSchedules.length) {
-        toast.error("No hay horarios nuevos válidos");
-        return;
+        throw new Error("No hay horarios nuevos válidos");
       }
 
-      await Promise.all(
+      return Promise.all(
         validSchedules.map((s) =>
           apiClient.post("/class-days", {
             days: s.days,
@@ -75,14 +83,25 @@ export function useFormClassSchedules(grupoId: string) {
           }),
         ),
       );
+    },
 
+    onSuccess: () => {
       toast.success("Horarios guardados correctamente");
+      queryClient.invalidateQueries({ queryKey: ["class-days", grupoId] });
       router.push("/academic-groups");
-    } catch (error) {
-      console.error("ERROR BACKEND:", error);
-      toast.error("Error al guardar horarios");
-    }
-  };
+    },
 
-  return { form, fields, handleAppend, handleRemove, onSubmit };
+    onError: (error: Error) => {
+      if (error.message === "No hay horarios nuevos válidos") {
+        toast.error(error.message);
+      } else {
+        console.error("ERROR BACKEND:", error);
+        toast.error("Error al guardar horarios");
+      }
+    },
+  });
+
+  const onSubmit = (values: ScheduleFormValues) => saveSchedules(values);
+
+  return { form, fields, handleAppend, handleRemove, onSubmit, isPending };
 }

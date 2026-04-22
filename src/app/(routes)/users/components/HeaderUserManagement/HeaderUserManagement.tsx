@@ -1,8 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Upload, UserRoundPlus } from "lucide-react";
+import { UserRoundPlus } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { BulkImportButton } from "@/components/shared/Bulkimportbutton";
 
 type HeaderSubjectProps = {
   onCreateClick: () => void;
@@ -18,14 +19,7 @@ export function HeaderUserManagement({ onCreateClick }: HeaderSubjectProps) {
         />
 
         <div className="flex flex-wrap justify-between gap-5">
-          <Button
-            variant="success"
-            className="flex items-center gap-2"
-            onClick={() => console.log("descargar")}
-          >
-            <Upload className="h-5 w-5" />
-            Importar CSV/Excel
-          </Button>
+          <BulkImportButton endpoint="/user/bulk/import" queryKey="users" />
 
           <Button className="flex items-center gap-2" onClick={onCreateClick}>
             <UserRoundPlus className="h-5 w-5" />
