@@ -70,13 +70,11 @@ export function useSemesters(limit = 10) {
     onSuccess: (res) => {
       toast.success("Acción realizada", {
         description: res.message,
-        position: "top-center",
       });
       closeModal();
     },
 
     onSettled: () => {
-      // Siempre revalida al final
       queryClient.invalidateQueries({ queryKey: ["semesters"] });
     },
   });

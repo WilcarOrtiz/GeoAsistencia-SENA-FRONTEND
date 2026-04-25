@@ -54,15 +54,12 @@ export default function ResetPasswordForm() {
     if (error) {
       toast.error("Error", {
         description: error.message,
-        position: "top-center",
       });
       setLoading(false);
       return;
     }
 
-    toast.success("Contraseña actualizada correctamente", {
-      position: "top-center",
-    });
+    toast.success("Contraseña actualizada correctamente");
 
     router.push("/home");
   };

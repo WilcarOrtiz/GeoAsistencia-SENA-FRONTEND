@@ -34,7 +34,6 @@ export function FormChangeState({ semester, onSuccess, onClose }: Props) {
 
     onSuccess: (res) => {
       toast.success(res.message);
-      // invalida semesters para que el listado se refresque
       queryClient.invalidateQueries({ queryKey: ["semesters"] });
       onSuccess?.();
       onClose();
@@ -42,9 +41,7 @@ export function FormChangeState({ semester, onSuccess, onClose }: Props) {
 
     onError: (error) => {
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message ?? "Opps, algo anda mal", {
-          position: "top-center",
-        });
+        toast.error(error.response?.data?.message ?? "Opps, algo anda mal");
       }
     },
   });

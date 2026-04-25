@@ -23,12 +23,14 @@ type FailedRow = {
 type BulkImportButtonProps = {
   endpoint: string;
   queryKey: string | string[];
+  extraQueryKeys?: string[][];
   label?: string;
 };
 
 export function BulkImportButton({
   endpoint,
   queryKey,
+  extraQueryKeys,
   label = "Importar",
 }: BulkImportButtonProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -49,10 +51,18 @@ export function BulkImportButton({
       return data;
     },
     onSuccess: (res) => {
+      console.log("respuestA: ", res);
       const { created, failed } = res.data ?? res;
-      queryClient.invalidateQueries({
-        queryKey: Array.isArray(queryKey) ? queryKey : [queryKey],
-      });
+
+      console.log("   const { created, failed } = res.data ?? res; ", res.data);
+      const allKeys = [
+        Array.isArray(queryKey) ? queryKey : [queryKey],
+        ...(extraQueryKeys ?? []),
+      ];
+
+      allKeys.forEach((key) =>
+        queryClient.invalidateQueries({ queryKey: key }),
+      );
 
       if (failed?.length > 0) {
         toast.warning(
@@ -65,7 +75,6 @@ export function BulkImportButton({
               )
               .join("\n"),
             duration: 8000,
-            position: "top-center",
           },
         );
       } else {
@@ -84,12 +93,10 @@ export function BulkImportButton({
               )
               .join("\n"),
             duration: 8000,
-            position: "top-center",
           });
         } else {
           toast.error(
             error.response?.data?.message ?? "Error al importar el archivo",
-            { position: "top-center" },
           );
         }
       }

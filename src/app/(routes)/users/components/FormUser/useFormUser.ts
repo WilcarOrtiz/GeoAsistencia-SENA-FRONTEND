@@ -80,14 +80,10 @@ export function useUserForm(user: FormUserProps["user"]) {
 
         await Promise.all(promises);
 
-        toast.success("Usuario actualizado correctamente", {
-          position: "top-center",
-        });
+        toast.success("Usuario actualizado correctamente");
       } else {
         await apiClient.post("/user", values);
-        toast.success("Usuario creado correctamente", {
-          position: "top-center",
-        });
+        toast.success("Usuario creado correctamente");
       }
 
       // Invalida todas las queries que empiecen con "users" o el user específico
@@ -99,7 +95,7 @@ export function useUserForm(user: FormUserProps["user"]) {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const message = error.response?.data?.message ?? "Opps, algo anda mal";
-        toast.error(message, { position: "top-center" });
+        toast.error(message);
       }
     }
   };

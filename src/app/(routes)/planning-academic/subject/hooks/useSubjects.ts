@@ -62,7 +62,6 @@ export function useSubjects(limit = 10) {
     onSuccess: (res) => {
       toast.success("Acción realizada", {
         description: res.message,
-        position: "top-center",
       });
       closeModal();
     },

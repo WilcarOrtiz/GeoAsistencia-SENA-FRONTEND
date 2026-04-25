@@ -28,7 +28,6 @@ type Props<TData> = {
 export function DataTableFilters<TData>({ table }: Props<TData>) {
   return (
     <div className="flex items-center gap-4 py-4">
-      {/* 🔍 BUSCADOR */}
       <Input
         placeholder="Filtrar por nombre o codigo..."
         value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -38,7 +37,6 @@ export function DataTableFilters<TData>({ table }: Props<TData>) {
         className="max-w-sm"
       />
 
-      {/* 🎯 FILTRO POR ESTADO */}
       <Select
         value={(table.getColumn("state")?.getFilterValue() as string) ?? ""}
         onValueChange={(value) =>

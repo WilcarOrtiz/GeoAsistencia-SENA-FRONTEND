@@ -11,7 +11,6 @@ import {
   useState,
   useCallback,
 } from "react";
-import { Console } from "console";
 
 export type AppUser = UserProfile["user"] & {
   email: string | null;
@@ -49,8 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       setUserProfile(profile);
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
+    } catch {
       setUserProfile(null);
     } finally {
       setIsLoading(false);

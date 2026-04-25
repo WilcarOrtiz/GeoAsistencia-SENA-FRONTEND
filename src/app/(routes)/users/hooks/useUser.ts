@@ -78,9 +78,9 @@ export function useUsers(limit = 10) {
     try {
       const res = await sendRecoveryEmail({ email: user.email });
       if (res.success) {
-        toast.success(res.message, { position: "top-center" });
+        toast.success(res.message);
       } else {
-        toast.error(res.message, { position: "top-center" });
+        toast.error(res.message);
       }
     } catch {
       toast.error("No se pudo enviar el correo de recuperación");

@@ -37,9 +37,8 @@ const ForgotPasswordForm = () => {
       const res = await isUserActive(values.email);
 
       if (!res) {
-        toast.error("Usuario inactivo o no registrado", {
-          position: "top-center",
-        });
+        console.log("respuesta", res);
+        toast.error("Usuario inactivo o no registrado");
         router.push("/error");
         setLoading(false);
         return;
@@ -50,12 +49,10 @@ const ForgotPasswordForm = () => {
       if (!result.success) {
         toast.error("Error al enviar correo", {
           description: result.message,
-          position: "top-center",
         });
       } else {
         toast.success("Enlace enviado", {
           description: result.message,
-          position: "top-center",
         });
 
         setTimeout(() => {
@@ -63,8 +60,7 @@ const ForgotPasswordForm = () => {
         }, 3500);
       }
     } catch (err) {
-      console.log(err);
-      toast.error("Error inesperado", { position: "top-center" });
+      toast.error("Error inesperado");
     } finally {
       setLoading(false);
     }

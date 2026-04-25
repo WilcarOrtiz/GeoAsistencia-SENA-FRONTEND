@@ -8,7 +8,7 @@ import { getIconByName } from "@/utils/icons";
 import Link from "next/link";
 
 export function NavSettings({ items }: { items: NavigationItem[] }) {
-  items = [
+  /* items = [
     {
       id: "ade8d06f-02c9-4c4d-8cd7-d40a8779486f",
       name: "Planeación académica",
@@ -60,7 +60,7 @@ export function NavSettings({ items }: { items: NavigationItem[] }) {
       order_index: 4,
       children: [],
     },
-  ];
+  ];*/
 
   return (
     <S.SidebarGroup>

@@ -28,9 +28,7 @@ export function DownloadTemplateLink({
       URL.revokeObjectURL(url);
     },
     onError: () => {
-      toast.error("No se pudo descargar la plantilla", {
-        position: "top-center",
-      });
+      toast.error("No se pudo descargar la plantilla");
     },
   });
 

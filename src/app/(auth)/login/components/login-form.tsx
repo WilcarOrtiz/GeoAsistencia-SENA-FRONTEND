@@ -47,7 +47,6 @@ const LoginForm = ({ className, ...props }: React.ComponentProps<"form">) => {
     if (!result.success) {
       toast.error("Credenciales incorrectas", {
         description: result.message,
-        position: "top-center",
       });
       setLoading(false);
       return;

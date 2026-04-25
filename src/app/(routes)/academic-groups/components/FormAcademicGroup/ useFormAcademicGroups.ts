@@ -58,7 +58,6 @@ export function useFormAcademicGroups(
         classGroup
           ? "Grupo actualizado correctamente"
           : "Grupo creado correctamente",
-        { position: "top-center" },
       );
       queryClient.invalidateQueries({ queryKey: ["academic-groups"] });
       if (classGroup) {
@@ -72,7 +71,7 @@ export function useFormAcademicGroups(
     onError: (error) => {
       if (axios.isAxiosError(error)) {
         const message = error.response?.data?.message ?? "Algo salió mal";
-        toast.error(message, { position: "top-center" });
+        toast.error(message);
       }
     },
   });

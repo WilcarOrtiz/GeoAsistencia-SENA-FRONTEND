@@ -10,6 +10,7 @@ export function AppSidebar({
 }: React.ComponentProps<typeof S.Sidebar>) {
   const { user, navigation } = useAuth();
 
+  console.log("navegacion", navigation);
   const userData = user
     ? {
         name: user.fullName,

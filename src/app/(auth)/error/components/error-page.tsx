@@ -12,7 +12,8 @@ const Error = () => {
         {/* Contenedor de texto alineado a la izquierda */}
         <div className="text-left max-w-md">
           <p className="text-p mb-4">
-            Hubo un problema durante el proceso de autenticación. Esto puede deberse a:
+            Hubo un problema durante el proceso de autenticación. Esto puede
+            deberse a:
           </p>
 
           <ul className="mb-4 list-disc list-inside text-small">
@@ -22,7 +23,8 @@ const Error = () => {
           </ul>
 
           <p className="mb-6 text-p">
-            Si el problema persiste, por favor contacta al administrador del sistema.
+            Si el problema persiste, por favor contacta al administrador del
+            sistema.
           </p>
         </div>
 

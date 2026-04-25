@@ -1,3 +1,11 @@
+import { SemesterState } from "../semester/semester.type";
+
+export interface ClassGroupOption {
+  id: string;
+  name: string;
+  code: string;
+}
+
 export interface ClassGroup {
   id: string;
   code: string;
@@ -17,6 +25,7 @@ export interface ClassGroup {
   semester: {
     id: string;
     name: string;
+    state: SemesterState;
   };
 
   teacher: {

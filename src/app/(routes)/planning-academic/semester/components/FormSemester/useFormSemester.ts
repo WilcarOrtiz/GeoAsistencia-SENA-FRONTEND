@@ -45,9 +45,7 @@ export function useFormSemester(
 
     onError: (error) => {
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message ?? "Opps, algo anda mal", {
-          position: "top-center",
-        });
+        toast.error(error.response?.data?.message ?? "Opps, algo anda mal");
       }
     },
   });
