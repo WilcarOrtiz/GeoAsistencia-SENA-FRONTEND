@@ -23,6 +23,7 @@ import { WeekDay, WeekDayLabel } from "@/types/weekDay";
 import { DownloadTemplateLink } from "@/components/shared/TemplateDownload";
 import { BulkImportButton } from "@/components/shared/Bulkimportbutton";
 import ListEnrollment from "./components/ListEnrrollments/page";
+import { useEnrollments } from "../../hook/useEnrollment";
 
 export default function DetailscademicGroupPage() {
   const router = useRouter();
@@ -30,6 +31,12 @@ export default function DetailscademicGroupPage() {
 
   const groupId =
     typeof id === "string" ? id : Array.isArray(id) ? id[0] : undefined;
+
+  const {
+    students,
+    isLoading: isLoadingStudents,
+    ...rest
+  } = useEnrollments(groupId ?? "");
 
   const { data: classGroup, isLoading } = useQuery<ClassGroup>({
     queryKey: ["class-group", groupId],
@@ -54,15 +61,14 @@ export default function DetailscademicGroupPage() {
 
   const capacity = classGroup.total_students;
   const maxCapacity = classGroup.max_students;
-  const attendanceRate = 0;
-  /*  const attendanceRate =
+
+  const attendanceRate =
     students.length > 0
       ? (
-          students.reduce((acc, s) => acc + s.attendance_percentage, 0) /
+          students.reduce((acc, s) => acc + (s.attendance_percentage ?? 0), 0) /
           students.length
         ).toFixed(1)
-      : "0";*/
-
+      : "0";
   return (
     <div className="container mx-auto py-6 space-y-8">
       {/* HEADER */}
@@ -152,8 +158,12 @@ export default function DetailscademicGroupPage() {
         })}
       </div>
 
-      {/* ESTUDIANTES */}
-      <ListEnrollment id={groupId} />
+      <ListEnrollment
+        id={groupId}
+        students={students}
+        isLoading={isLoadingStudents}
+        {...rest}
+      />
 
       {/* LOWER */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-5">
@@ -165,10 +175,16 @@ export default function DetailscademicGroupPage() {
                 Sesiones realizadas
               </p>
             </div>
-
-            <span className="text-5xl font-bold">
-              {classGroup.total_sessions ?? 0}
-            </span>
+            <button
+              onClick={() => {
+                router.push(`/academic-groups/${id}/details/attendances`);
+              }}
+            >
+              {" "}
+              <span className="text-5xl font-bold">
+                {classGroup.total_sessions ?? 0}
+              </span>
+            </button>{" "}
           </CardContent>
         </Card>
 

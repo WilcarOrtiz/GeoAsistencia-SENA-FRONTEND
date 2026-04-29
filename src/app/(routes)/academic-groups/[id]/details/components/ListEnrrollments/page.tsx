@@ -1,18 +1,26 @@
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
 import { DataTable } from "./data-table";
-import { columns } from "./columns";
-import { useEnrollments } from "@/app/(routes)/academic-groups/hook/useEnrollment";
+import { columns, Enrollment } from "./columns";
 
-export default function ListEnrollment({ id }: { id: string }) {
-  const {
-    students,
-    isLoading,
-    removeStudents,
-    isRemoving,
-    transferStudents,
-    isTransferring,
-  } = useEnrollments(id);
+interface ListEnrollmentProps {
+  id: string;
+  students: Enrollment[];
+  isLoading: boolean;
+  removeStudents: (ids: string[]) => Promise<void>;
+  isRemoving: boolean;
+  transferStudents: (ids: string[], toGroupId: string) => Promise<void>;
+  isTransferring: boolean;
+}
 
+export default function ListEnrollment({
+  id,
+  students,
+  isLoading,
+  removeStudents,
+  isRemoving,
+  transferStudents,
+  isTransferring,
+}: ListEnrollmentProps) {
   if (isLoading) return <TableSkeleton />;
 
   return (

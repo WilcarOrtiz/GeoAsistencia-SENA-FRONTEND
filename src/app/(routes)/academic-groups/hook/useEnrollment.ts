@@ -25,8 +25,17 @@ export function useEnrollments(groupId?: string) {
   });
 
   const { mutateAsync: removeStudents, isPending: isRemoving } = useMutation({
-    mutationFn: (studentIds: string[]) =>
-      apiClient.patch(`/enrollment/remove`, { studentIds, groupId }),
+    mutationFn: (studentIds: string[]) => {
+      console.log("📤 Enviando:", {
+        groupId,
+        studentIds,
+      });
+
+      return apiClient.patch(`/enrollment/remove`, {
+        toGroupId: groupId,
+        students: studentIds,
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["enrollment", groupId] });
       queryClient.invalidateQueries({ queryKey: ["class-group", groupId] });
@@ -62,6 +71,7 @@ export function useEnrollments(groupId?: string) {
       },
       onError: () => toast.error("Error al transferir estudiantes"),
     });
+
   return {
     students: data ?? [],
     isLoading,
