@@ -52,7 +52,3 @@ export default function AcademicGroupPage() {
     </div>
   );
 }
-
-/*useClassGroups.ts     → CRUD de grupos (listar, crear, editar, eliminar)
-useEnrollments.ts     → matricular, dar de baja, transferir estudiantes
-useClassSessions.ts   → sesiones de clase, abrir/cerrar asistencia*/

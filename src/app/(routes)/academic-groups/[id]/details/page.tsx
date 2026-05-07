@@ -22,7 +22,7 @@ import { useClassSchedules } from "../../hook/useClassDays";
 import { WeekDay, WeekDayLabel } from "@/types/weekDay";
 import { DownloadTemplateLink } from "@/components/shared/TemplateDownload";
 import { BulkImportButton } from "@/components/shared/Bulkimportbutton";
-import ListEnrollment from "./components/ListEnrrollments/page";
+import ListEnrollment from "./components/ListEnrrollments/List";
 import { useEnrollments } from "../../hook/useEnrollment";
 
 export default function DetailscademicGroupPage() {
