@@ -1,15 +1,15 @@
 "use client";
 
 import {
-  Bar,
-  BarChart,
+  Area,
+  AreaChart,
   CartesianGrid,
-  XAxis,
-  YAxis,
-  Legend,
   ResponsiveContainer,
   Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
+
 import {
   Card,
   CardContent,
@@ -17,6 +17,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+
 import type { GroupAttendance } from "@/features/dashboard/dashboard.types";
 
 interface Props {
@@ -24,40 +25,64 @@ interface Props {
   isLoading: boolean;
 }
 
-// Tooltip personalizado con toda la info del grupo
-function CustomTooltip({ active, payload, label }: any) {
+function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
 
   const d = payload[0]?.payload as GroupAttendance;
 
   return (
-    <div className="rounded-lg border bg-background p-3 shadow-md text-sm space-y-1 min-w-48">
-      <p className="font-semibold text-foreground">{d.group_name}</p>
-      <p className="text-muted-foreground text-xs">{d.subject_name}</p>
-      {d.teacher_name && (
-        <p className="text-muted-foreground text-xs">
-          Docente: {d.teacher_name}
-        </p>
-      )}
-      {d.semester_name && (
-        <p className="text-muted-foreground text-xs">
-          Semestre: {d.semester_name}
-        </p>
-      )}
-      <div className="border-t pt-1 mt-1 space-y-1">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-1.5">
-            <span className="inline-block size-2.5 rounded-sm bg-green-500" />
-            <span>Asistencia</span>
+    <div
+      className="
+        min-w-52
+        rounded-2xl
+        border
+        bg-background/95
+        p-4
+        shadow-xl
+        backdrop-blur
+      "
+    >
+      <div className="space-y-1">
+        <p className="font-semibold text-foreground">{d.group_name}</p>
+
+        <p className="text-xs text-muted-foreground">{d.subject_name}</p>
+
+        {d.teacher_name && (
+          <p className="text-xs text-muted-foreground">
+            Docente: {d.teacher_name}
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 space-y-2 border-t pt-3">
+        <div className="flex items-center justify-between gap-6">
+          <div className="flex items-center gap-2">
+            <span
+              className="size-2.5 rounded-full"
+              style={{
+                background: "var(--chart-1)",
+              }}
+            />
+
+            <span className="text-sm">Asistencia</span>
           </div>
-          <span className="font-medium">{d.porcentaje_asistencia}%</span>
+
+          <span className="font-semibold">{d.porcentaje_asistencia}%</span>
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-1.5">
-            <span className="inline-block size-2.5 rounded-sm bg-red-400" />
-            <span>Inasistencia</span>
+
+        <div className="flex items-center justify-between gap-6">
+          <div className="flex items-center gap-2">
+            <span
+              className="size-2.5 rounded-full"
+              style={{
+                background: "var(--chart-5)",
+              }}
+            />
+
+            <span className="text-sm">Inasistencia</span>
           </div>
-          <span className="font-medium">{d.porcentaje_inasistencia}%</span>
+
+          <span className="font-semibold">{d.porcentaje_inasistencia}%</span>
         </div>
       </div>
     </div>
@@ -66,67 +91,144 @@ function CustomTooltip({ active, payload, label }: any) {
 
 export function AttendanceBarChart({ data, isLoading }: Props) {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="card-modern border-0">
+      <CardHeader className="pb-2">
         <CardTitle>Asistencia por grupo</CardTitle>
+
         <CardDescription>
-          Porcentaje de asistencia e inasistencia por grupo
+          Tendencia de asistencia e inasistencia
         </CardDescription>
       </CardHeader>
+
       <CardContent>
         {isLoading ? (
-          <div className="h-64 animate-pulse rounded-lg bg-muted" />
+          <div className="h-[320px] animate-pulse rounded-2xl bg-muted" />
         ) : data.length === 0 ? (
-          <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">
+          <div className="flex h-[320px] items-center justify-center text-sm text-muted-foreground">
             Sin datos disponibles
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={320}>
-            <BarChart
+            <AreaChart
               data={data}
-              margin={{ top: 0, right: 0, left: -20, bottom: 70 }}
-              barCategoryGap="30%" // espacio entre grupos
-              barGap={4} // espacio entre las dos barras
+              margin={{
+                top: 10,
+                right: 10,
+                left: -20,
+                bottom: 40,
+              }}
             >
-              <CartesianGrid vertical={false} />
+              <defs>
+                <linearGradient
+                  id="attendanceGradient"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop
+                    offset="5%"
+                    stopColor="var(--chart-1)"
+                    stopOpacity={0.35}
+                  />
+
+                  <stop
+                    offset="95%"
+                    stopColor="var(--chart-1)"
+                    stopOpacity={0}
+                  />
+                </linearGradient>
+
+                <linearGradient
+                  id="absenceGradient"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop
+                    offset="5%"
+                    stopColor="var(--chart-5)"
+                    stopOpacity={0.25}
+                  />
+
+                  <stop
+                    offset="95%"
+                    stopColor="var(--chart-5)"
+                    stopOpacity={0}
+                  />
+                </linearGradient>
+              </defs>
+
+              <CartesianGrid
+                vertical={false}
+                strokeDasharray="3 3"
+                opacity={0.2}
+              />
+
               <XAxis
                 dataKey="group_name"
                 tickLine={false}
                 axisLine={false}
-                angle={-35}
+                tick={{
+                  fontSize: 11,
+                  fill: "var(--muted-foreground)",
+                }}
+                angle={-20}
                 textAnchor="end"
-                tick={{ fontSize: 11 }}
                 interval={0}
+                height={60}
               />
+
               <YAxis
                 domain={[0, 100]}
-                unit="%"
                 tickLine={false}
                 axisLine={false}
-                tick={{ fontSize: 11 }}
+                tick={{
+                  fontSize: 11,
+                  fill: "var(--muted-foreground)",
+                }}
+                unit="%"
               />
-              <Tooltip
-                content={<CustomTooltip />}
-                cursor={{ fill: "hsl(var(--muted))", opacity: 0.5 }}
-              />
-              <Legend verticalAlign="top" height={36} />
 
-              <Bar
+              <Tooltip cursor={false} content={<CustomTooltip />} />
+
+              {/* ASISTENCIA */}
+              <Area
+                type="monotone"
                 dataKey="porcentaje_asistencia"
                 name="Asistencia"
-                fill="var(--chart-1)"
-                radius={[4, 4, 0, 0]}
-                maxBarSize={40}
+                stroke="var(--chart-1)"
+                fill="url(#attendanceGradient)"
+                strokeWidth={3}
+                dot={{
+                  r: 4,
+                  fill: "var(--chart-1)",
+                  strokeWidth: 0,
+                }}
+                activeDot={{
+                  r: 6,
+                }}
               />
 
-              <Bar
+              {/* INASISTENCIA */}
+              <Area
+                type="monotone"
                 dataKey="porcentaje_inasistencia"
                 name="Inasistencia"
-                fill="var(--chart-5)"
-                radius={[4, 4, 0, 0]}
-                maxBarSize={40}
+                stroke="var(--chart-5)"
+                fill="url(#absenceGradient)"
+                strokeWidth={3}
+                dot={{
+                  r: 4,
+                  fill: "var(--chart-5)",
+                  strokeWidth: 0,
+                }}
+                activeDot={{
+                  r: 6,
+                }}
               />
-            </BarChart>
+            </AreaChart>
           </ResponsiveContainer>
         )}
       </CardContent>

@@ -2,13 +2,7 @@
 
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 
 import { AttendanceDistribution } from "@/features/dashboard/dashboard.types";
 
@@ -41,38 +35,108 @@ export function AttendanceDonut({ data, isLoading }: Props) {
   const totalStudents = data.reduce((acc, item) => acc + item.total, 0);
 
   return (
-    <Card className="card-modern">
-      <CardHeader className="space-y-1">
-        <CardTitle>Distribución de asistencia</CardTitle>
+    <CardContent>
+      {isLoading ? (
+        <div className="h-[320px] animate-pulse rounded-2xl bg-muted" />
+      ) : (
+        <div className="grid h-[320px] grid-cols-[1.2fr_0.8fr] gap-4">
+          {/* LEFT */}
+          <div className="flex h-full flex-col rounded-2xl border p-4">
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">
+                Distribución de asistencia
+              </h3>
 
-        <CardDescription>
-          Estado general de asistencia estudiantil
-        </CardDescription>
-      </CardHeader>
+              <p className="text-xs text-muted-foreground">
+                Estado general estudiantil
+              </p>
+            </div>
 
-      <CardContent>
-        {isLoading ? (
-          <div className="h-64 animate-pulse rounded-xl bg-muted" />
-        ) : (
-          <div className="flex flex-col items-center gap-6">
-            {/* CHART */}
-            <div className="relative h-[260px] w-full">
+            <div className="relative flex-1">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
+                  {/* GRADIENTS */}
+                  <defs>
+                    <linearGradient
+                      id="gradientPresent"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor="var(--chart-2)"
+                        stopOpacity={1}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="var(--chart-2)"
+                        stopOpacity={0.25}
+                      />
+                    </linearGradient>
+
+                    <linearGradient
+                      id="gradientAbsent"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor="var(--chart-5)"
+                        stopOpacity={1}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="var(--chart-5)"
+                        stopOpacity={0.25}
+                      />
+                    </linearGradient>
+
+                    <linearGradient
+                      id="gradientLate"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor="var(--chart-3)"
+                        stopOpacity={1}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="var(--chart-3)"
+                        stopOpacity={0.25}
+                      />
+                    </linearGradient>
+                  </defs>
+
                   <Pie
                     data={formatted}
                     dataKey="value"
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    innerRadius={70}
-                    outerRadius={95}
+                    innerRadius={60}
+                    outerRadius={88}
                     paddingAngle={4}
                     stroke="transparent"
                   >
-                    {formatted.map((entry) => (
-                      <Cell key={entry.key} fill={entry.color} />
-                    ))}
+                    {formatted.map((entry) => {
+                      const gradientMap: Record<string, string> = {
+                        PRESENT: "url(#gradientPresent)",
+                        ABSENT: "url(#gradientAbsent)",
+                        LATE: "url(#gradientLate)",
+                      };
+
+                      return (
+                        <Cell key={entry.key} fill={gradientMap[entry.key]} />
+                      );
+                    })}
                   </Pie>
 
                   <Tooltip
@@ -81,7 +145,6 @@ export function AttendanceDonut({ data, isLoading }: Props) {
                       background: "var(--card)",
                       border: "1px solid var(--border)",
                       borderRadius: "16px",
-                      boxShadow: "var(--shadow-card)",
                       color: "var(--foreground)",
                     }}
                     formatter={(value, name, props) => [
@@ -92,47 +155,61 @@ export function AttendanceDonut({ data, isLoading }: Props) {
                 </PieChart>
               </ResponsiveContainer>
 
-              {/* CENTER CONTENT */}
+              {/* CENTER */}
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-3xl font-bold text-foreground">
                   {totalStudents}
                 </span>
 
-                <span className="text-sm text-muted-foreground">Registros</span>
+                <span className="text-xs text-muted-foreground">Registros</span>
               </div>
             </div>
-
-            {/* CUSTOM LEGEND */}
-            <div className="grid w-full grid-cols-3 gap-3">
-              {formatted.map((item) => (
-                <div
-                  key={item.key}
-                  className="rounded-xl border bg-background/50 p-3"
-                >
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="size-2.5 rounded-full"
-                      style={{
-                        background: item.color,
-                      }}
-                    />
-
-                    <span className="text-sm font-medium">{item.name}</span>
-                  </div>
-
-                  <div className="mt-2">
-                    <p className="text-2xl font-bold">{item.value}%</p>
-
-                    <p className="text-xs text-muted-foreground">
-                      {item.total} registros
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
+
+          {/* RIGHT */}
+          <div className="grid h-full grid-rows-3 gap-3">
+            {formatted.map((item) => (
+              <div
+                key={item.key}
+                className="
+                  flex
+                  flex-col
+                  justify-between
+                  rounded-2xl
+                  border
+                  p-4
+                  transition-all
+                  duration-200
+                  hover:-translate-y-0.5
+                "
+              >
+                <div className="flex items-center gap-2">
+                  <span
+                    className="size-3 rounded-full"
+                    style={{
+                      background: item.color,
+                    }}
+                  />
+
+                  <span className="text-sm font-medium text-foreground">
+                    {item.name}
+                  </span>
+                </div>
+
+                <div>
+                  <p className="text-xl font-bold text-foreground">
+                    {item.value}%
+                  </p>
+
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {item.total} registros
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </CardContent>
   );
 }

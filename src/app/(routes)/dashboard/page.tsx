@@ -2,11 +2,12 @@
 
 import { useDashboard } from "./hook/useDashboard";
 import { DashboardCards } from "./components/DashboardCards";
-import { AttendanceBarChart } from "./components/AttendanceBarChart";
+
 import { SubjectsRankingTable } from "./components/SubjectsRankingTable";
 import { StudentsAbsencesTable } from "./components/StudentsAbsencesTable";
 import { AttendanceDonut } from "./components/AttendanceDonut";
 import { DashboardFilters } from "./components/DashboardFilters";
+import { AttendanceBarChart } from "./components/AttendanceBarChart";
 
 const ROLE = "ADMIN"; // o "TEACHER"
 

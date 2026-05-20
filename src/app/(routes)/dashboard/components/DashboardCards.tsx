@@ -1,6 +1,11 @@
+// features/dashboard/components/DashboardCards.tsx
+
 import { Activity, Users, BookOpen, AlertTriangle } from "lucide-react";
+
 import { Card } from "@/components/ui/card";
+
 import { DashboardOverview } from "@/features/dashboard/dashboard.types";
+
 import { MetricCard } from "@/components/shared/MetricCard";
 
 interface Props {
