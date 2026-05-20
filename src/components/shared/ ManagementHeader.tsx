@@ -16,6 +16,10 @@ type ManagementHeaderProps = {
   buttonIcon?: LucideIcon;
   onButtonClick?: () => void;
 
+  secondaryButtonLabel?: string;
+  secondaryButtonIcon?: LucideIcon;
+  onSecondaryButtonClick?: () => void;
+
   extraActions?: ReactNode;
 };
 
@@ -25,30 +29,50 @@ export function ManagementHeader({
   backHref,
 
   buttonLabel,
-  buttonIcon: Icon,
+  buttonIcon: PrimaryIcon,
   onButtonClick,
+
+  secondaryButtonLabel,
+  secondaryButtonIcon: SecondaryIcon,
+  onSecondaryButtonClick,
 
   extraActions,
 }: ManagementHeaderProps) {
   return (
     <div className="p-10">
       <div className="flex flex-wrap items-start justify-between gap-4">
+        {/* HEADER INFO */}
         <PageHeader
           title={title}
           description={description}
           backHref={backHref}
         />
 
-        {(extraActions || buttonLabel) && (
-          <div className="flex flex-wrap justify-between gap-5">
+        {/* ACTIONS */}
+        {(extraActions || buttonLabel || secondaryButtonLabel) && (
+          <div className="flex flex-wrap items-center gap-3">
             {extraActions}
 
+            {/* SECONDARY BUTTON */}
+            {secondaryButtonLabel && onSecondaryButtonClick && (
+              <Button
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={onSecondaryButtonClick}
+              >
+                {SecondaryIcon && <SecondaryIcon className="h-4 w-4" />}
+                {secondaryButtonLabel}
+              </Button>
+            )}
+
+            {/* PRIMARY BUTTON */}
             {buttonLabel && onButtonClick && (
               <Button
+                variant="default"
                 className="flex items-center gap-2"
                 onClick={onButtonClick}
               >
-                {Icon && <Icon className="h-5 w-5" />}
+                {PrimaryIcon && <PrimaryIcon className="h-4 w-4" />}
                 {buttonLabel}
               </Button>
             )}

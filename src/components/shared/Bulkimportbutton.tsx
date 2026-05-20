@@ -51,10 +51,8 @@ export function BulkImportButton({
       return data;
     },
     onSuccess: (res) => {
-      console.log("respuestA: ", res);
       const { created, failed } = res.data ?? res;
 
-      console.log("   const { created, failed } = res.data ?? res; ", res.data);
       const allKeys = [
         Array.isArray(queryKey) ? queryKey : [queryKey],
         ...(extraQueryKeys ?? []),
@@ -119,7 +117,7 @@ export function BulkImportButton({
         }}
       />
       <Button
-        variant="success"
+        variant="outline"
         className="flex items-center gap-2"
         onClick={() => fileInputRef.current?.click()}
         disabled={isPending}

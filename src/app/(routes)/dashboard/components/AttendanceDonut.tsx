@@ -1,9 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell } from "recharts";
-
 import { CardContent } from "@/components/ui/card";
-
 import { AttendanceDistribution } from "@/features/dashboard/dashboard.types";
 
 const COLORS: Record<string, string> = {
@@ -41,12 +39,11 @@ export function AttendanceDonut({ data, isLoading }: Props) {
       ) : (
         <div className="grid h-[320px] grid-cols-[1.2fr_0.8fr] gap-4">
           {/* LEFT */}
-          <div className="flex h-full flex-col rounded-2xl border p-4">
+          <div className="flex h-full flex-col rounded-2xl border border-border bg-card p-4">
             <div>
               <h3 className="text-sm font-semibold text-foreground">
                 Distribución de asistencia
               </h3>
-
               <p className="text-xs text-muted-foreground">
                 Estado general estudiantil
               </p>
@@ -55,7 +52,6 @@ export function AttendanceDonut({ data, isLoading }: Props) {
             <div className="relative flex-1">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  {/* GRADIENTS */}
                   <defs>
                     <linearGradient
                       id="gradientPresent"
@@ -160,7 +156,6 @@ export function AttendanceDonut({ data, isLoading }: Props) {
                 <span className="text-3xl font-bold text-foreground">
                   {totalStudents}
                 </span>
-
                 <span className="text-xs text-muted-foreground">Registros</span>
               </div>
             </div>
@@ -172,25 +167,19 @@ export function AttendanceDonut({ data, isLoading }: Props) {
               <div
                 key={item.key}
                 className="
-                  flex
-                  flex-col
-                  justify-between
-                  rounded-2xl
-                  border
+                  flex flex-col justify-between
+                  rounded-2xl border border-border
+                  bg-card
                   p-4
-                  transition-all
-                  duration-200
-                  hover:-translate-y-0.5
+                  transition-all duration-200
+                  hover:-translate-y-0.5 hover:shadow-sm
                 "
               >
                 <div className="flex items-center gap-2">
                   <span
                     className="size-3 rounded-full"
-                    style={{
-                      background: item.color,
-                    }}
+                    style={{ background: item.color }}
                   />
-
                   <span className="text-sm font-medium text-foreground">
                     {item.name}
                   </span>
@@ -200,7 +189,6 @@ export function AttendanceDonut({ data, isLoading }: Props) {
                   <p className="text-xl font-bold text-foreground">
                     {item.value}%
                   </p>
-
                   <p className="mt-1 text-xs text-muted-foreground">
                     {item.total} registros
                   </p>

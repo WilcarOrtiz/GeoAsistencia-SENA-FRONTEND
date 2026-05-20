@@ -39,7 +39,13 @@ export function ClassGroupCard({
           </div>
 
           <div className="flex items-center gap-2 justify-end">
-            <Badge variant={is_active ? "success" : "inactive"}>
+            <Badge
+              className={
+                is_active
+                  ? "border border-green-500/30 bg-green-500/10 text-green-700"
+                  : "border border-muted bg-muted text-muted-foreground"
+              }
+            >
               {is_active ? "ACTIVE" : "INACTIVE"}
             </Badge>
 

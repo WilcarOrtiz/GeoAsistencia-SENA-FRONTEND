@@ -4,13 +4,13 @@ import * as React from "react";
 import * as S from "@/components/ui/sidebar";
 import { DatePicker, NavSettings, NavUser } from "./sidebarComponents";
 import { useAuth } from "@/context/authContext";
+import Image from "next/image";
 
 export function AppSidebar({
   ...props
 }: React.ComponentProps<typeof S.Sidebar>) {
   const { user, navigation } = useAuth();
 
-  console.log("navegacion", navigation);
   const userData = user
     ? {
         name: user.fullName,
@@ -21,15 +21,15 @@ export function AppSidebar({
   return (
     <S.Sidebar collapsible="icon" {...props}>
       <S.SidebarHeader>
-        <div className="flex items-center gap-3 px-3 py-2">
-          <img
-            src="/assets/logo.png"
+        <div className="flex items-center justify-center pt-3">
+          <Image
+            src="/assets/logotipo.png"
             alt="EduPin logo"
-            className="w-8 h-8 object-contain shrink-0"
+            width={100}
+            height={100}
+            priority
+            className="object-contain"
           />
-          <span className="font-bold text-xl tracking-tight group-data-[collapsible=icon]:hidden">
-            EduPin
-          </span>
         </div>
       </S.SidebarHeader>
       <S.SidebarContent>

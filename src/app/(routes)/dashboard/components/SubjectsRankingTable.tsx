@@ -23,7 +23,9 @@ export function SubjectsRankingTable({ data, isLoading }: Props) {
       <CardHeader>
         <CardTitle>Ranking de asignaturas</CardTitle>
 
-        <CardDescription>Ordenadas por asistencia</CardDescription>
+        <CardDescription>
+          Asignaturas con mayor asistencia estudiantil
+        </CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -50,34 +52,29 @@ export function SubjectsRankingTable({ data, isLoading }: Props) {
                       {s.subject_name}
                     </p>
                   </div>
-
-                  <Badge
-                    variant="secondary"
-                    className="
-                      border-0
-                      bg-[color:var(--chart-2)]
-                      text-white
-                    "
-                  >
-                    {s.porcentaje_asistencia}%
-                  </Badge>
                 </div>
 
                 {/* BAR */}
-                <div className="h-2 overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="
-                      h-full
-                      rounded-full
-                      transition-all
-                      duration-500
-                    "
-                    style={{
-                      width: `${s.porcentaje_asistencia}%`,
-                      background:
-                        "linear-gradient(to right, var(--chart-1), var(--chart-2))",
-                    }}
-                  />
+                <div className="flex items-center gap-2">
+                  {/* BAR */}
+                  <div className="flex-1 h-2 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full transition-all duration-500 opacity-70"
+                      style={{
+                        width: `${s.porcentaje_asistencia}%`,
+                        background:
+                          "linear-gradient(to right, var(--chart-1), var(--chart-2))",
+                      }}
+                    />
+                  </div>
+
+                  {/* BADGE */}
+                  <Badge
+                    variant="secondary"
+                    className="border-0 bg-background/80 text-foreground backdrop-blur"
+                  >
+                    {s.porcentaje_asistencia}%
+                  </Badge>
                 </div>
               </div>
             ))}

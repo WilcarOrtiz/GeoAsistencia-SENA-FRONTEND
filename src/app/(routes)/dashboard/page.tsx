@@ -57,17 +57,17 @@ export default function DashboardPage() {
           <div
             className={`grid grid-cols-1 gap-4 px-4 lg:px-6 ${isAdmin ? "lg:grid-cols-2" : ""}`}
           >
+            <StudentsAbsencesTable
+              data={studentsAbsences}
+              isLoading={isLoading}
+              isAdmin={isAdmin}
+            />
             {isAdmin && (
               <SubjectsRankingTable
                 data={subjectsRanking}
                 isLoading={isLoading}
               />
             )}
-            <StudentsAbsencesTable
-              data={studentsAbsences}
-              isLoading={isLoading}
-              isAdmin={isAdmin}
-            />
           </div>
         </div>
       </div>
