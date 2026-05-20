@@ -14,17 +14,6 @@ export interface ClassSession {
   total_present: number;
 }
 
-export interface ClassSession {
-  id: string;
-  class_topic: string;
-  date: string;
-  is_open: boolean;
-  attendance_opened_at: string;
-  attendance_closed_at: string;
-  total_students: number;
-  total_present: number;
-}
-
 export function useClassSessions(groupId?: string): {
   sessions: ClassSession[];
   isLoading: boolean;

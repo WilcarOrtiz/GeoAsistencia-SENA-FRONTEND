@@ -1,12 +1,12 @@
 "use client";
 
-import { PageHeader } from "@/components/shared/PageHeader";
 import { FormAcademicGroups } from "../../components/FormAcademicGroup";
 import { ClassGroup } from "@/features/classGroup/ClassGroup.type";
 import { apiClient } from "@/lib/api/api_client";
 import { useParams, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { FormSkeleton } from "@/components/shared/FormSkeleton";
+import { ManagementHeader } from "@/components/shared/ ManagementHeader";
 
 export default function UpdateAcademicGroupPage() {
   const { id } = useParams();
@@ -25,13 +25,14 @@ export default function UpdateAcademicGroupPage() {
   if (isLoading) return <FormSkeleton fields={6} />;
 
   return (
-    <div className="container mx-auto pt-4">
-      <PageHeader
+    <div>
+      <ManagementHeader
         title="Actualizar Grupo academico"
         description="Actualiza la informacion de un grupo de clase "
         backHref="/academic-groups"
       />
-      <div className="container mx-auto py-10 ">
+
+      <div className="pl-10 pr-10">
         <FormAcademicGroups classGroup={classGroup} mode={mode} />
       </div>
     </div>

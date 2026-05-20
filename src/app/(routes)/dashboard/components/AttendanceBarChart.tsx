@@ -111,18 +111,18 @@ export function AttendanceBarChart({ data, isLoading }: Props) {
               />
               <Legend verticalAlign="top" height={36} />
 
-              {/* ✅ Sin stackId → barras lado a lado */}
               <Bar
                 dataKey="porcentaje_asistencia"
                 name="Asistencia"
-                fill="#22c55e"
+                fill="var(--chart-1)"
                 radius={[4, 4, 0, 0]}
                 maxBarSize={40}
               />
+
               <Bar
                 dataKey="porcentaje_inasistencia"
                 name="Inasistencia"
-                fill="#f87171"
+                fill="var(--chart-5)"
                 radius={[4, 4, 0, 0]}
                 maxBarSize={40}
               />

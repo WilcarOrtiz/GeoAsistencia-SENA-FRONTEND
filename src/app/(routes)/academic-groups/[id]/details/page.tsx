@@ -9,7 +9,7 @@ import { ClassGroup } from "@/features/classGroup/ClassGroup.type";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { FormSkeleton } from "@/components/shared/FormSkeleton";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   ArrowLeft,
   CalendarDays,
@@ -24,6 +24,10 @@ import { DownloadTemplateLink } from "@/components/shared/TemplateDownload";
 import { BulkImportButton } from "@/components/shared/Bulkimportbutton";
 import ListEnrollment from "./components/ListEnrrollments/List";
 import { useEnrollments } from "../../hook/useEnrollment";
+import { MetricCard } from "@/components/shared/MetricCard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AttendanceHistoryTable } from "./components/AttendanceHistoryTable/AttendanceHistoryTable";
+import { useClassSessions } from "../../hook/useClassSesions";
 
 export default function DetailscademicGroupPage() {
   const router = useRouter();
@@ -50,6 +54,7 @@ export default function DetailscademicGroupPage() {
   });
 
   const { schedules } = useClassSchedules(groupId ?? "");
+  const { sessions } = useClassSessions(groupId ?? "");
 
   if (!groupId) {
     return <p className="p-6">Grupo inválido</p>;
@@ -69,9 +74,9 @@ export default function DetailscademicGroupPage() {
           students.length
         ).toFixed(1)
       : "0";
+
   return (
-    <div className="container mx-auto py-6 space-y-8">
-      {/* HEADER */}
+    <div className="pl-10 pr-10 pt-5 space-y-8">
       <Button
         variant="ghost"
         size="sm"
@@ -103,7 +108,12 @@ export default function DetailscademicGroupPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-10">
+          <DownloadTemplateLink
+            endpoint="/enrollment/bulk/template"
+            label="Estudiantes"
+          />
+
           <BulkImportButton
             endpoint={`/enrollment/bulk/import/${groupId}`}
             queryKey={["enrollment", groupId]}
@@ -117,56 +127,57 @@ export default function DetailscademicGroupPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           {
-            label: "Total de estudiantes",
+            title: "Total de estudiantes",
             value: capacity,
             icon: Users,
           },
+
           {
-            label: "Tasa de asistencia",
+            title: "Tasa de asistencia",
             value: `${attendanceRate}%`,
             icon: TrendingUp,
           },
+
           {
-            label: "Capacidad actual",
+            title: "Capacidad actual",
             value: `${capacity}/${maxCapacity}`,
             extra: `(${Math.round((capacity / maxCapacity) * 100)}%)`,
             icon: Layers,
           },
-        ].map((item, i) => {
-          const Icon = item.icon;
-
-          return (
-            <Card key={i}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs uppercase flex justify-between">
-                  {item.label}
-                  <Icon className="w-4 h-4" />
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent className="flex items-end gap-2">
-                <span className="text-2xl font-semibold">{item.value}</span>
-
-                {item.extra && (
-                  <span className="text-sm text-muted-foreground">
-                    {item.extra}
-                  </span>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })}
+        ].map((item) => (
+          <MetricCard
+            key={item.title}
+            title={item.title}
+            value={item.value}
+            icon={item.icon}
+            extra={item.extra}
+          />
+        ))}
       </div>
+      {/*Lista de asistencia y lista de clase*/}
 
-      <ListEnrollment
-        id={groupId}
-        students={students}
-        isLoading={isLoadingStudents}
-        {...rest}
-      />
+      <Tabs defaultValue="enrollments" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="enrollments">Lista de estudiantes</TabsTrigger>
+          <TabsTrigger value="attendance">Historial de asistencias</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="enrollments">
+          <ListEnrollment
+            id={groupId}
+            students={students}
+            isLoading={isLoadingStudents}
+            {...rest}
+          />
+        </TabsContent>
+
+        <TabsContent value="attendance">
+          <AttendanceHistoryTable sessions={sessions} />
+        </TabsContent>
+      </Tabs>
 
       {/* LOWER */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="flex items-center justify-between">
             <div>
@@ -210,11 +221,6 @@ export default function DetailscademicGroupPage() {
           </div>
         </div>
       </div>
-
-      <DownloadTemplateLink
-        endpoint="/enrollment/bulk/template"
-        label="Estudiantes"
-      />
     </div>
   );
 }

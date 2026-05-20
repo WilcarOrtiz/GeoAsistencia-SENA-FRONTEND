@@ -19,6 +19,7 @@ import { useSubjects } from "./hooks";
 import { DownloadTemplateLink } from "@/components/shared/TemplateDownload";
 import { CirclePlus } from "lucide-react";
 import { ManagementHeader } from "@/components/shared/ ManagementHeader";
+import { BulkImportButton } from "@/components/shared/Bulkimportbutton";
 
 export default function SubjectPage() {
   const {
@@ -52,6 +53,12 @@ export default function SubjectPage() {
         buttonLabel="Registrar"
         buttonIcon={CirclePlus}
         onButtonClick={() => openModal("create")}
+        extraActions={
+          <BulkImportButton
+            endpoint="/subjects/bulk/import"
+            queryKey="subjects"
+          />
+        }
       />
 
       <div className="pl-10 pr-10">
