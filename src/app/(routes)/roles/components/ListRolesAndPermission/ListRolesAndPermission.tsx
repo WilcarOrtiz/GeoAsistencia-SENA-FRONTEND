@@ -42,18 +42,14 @@ export default function ListRolesAndPermission() {
   if (isLoading || loadingRoles) return <TableSkeleton />;
 
   return (
-    <div className="container mx-auto py-10 space-y-4">
+    <div className="space-y-4">
       <Input
         placeholder="Filtrar permiso..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="max-w-sm"
       />
-      <PermissionMatrix
-        permissions={filtered}
-        roles={roles}
-        page={page} // ← pasar page para que el cache coincida
-      />
+      <PermissionMatrix permissions={filtered} roles={roles} page={page} />
       <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );

@@ -15,9 +15,10 @@ import {
 import { AlertDialogDestructive } from "@/components/shared/AlertDialogDestructive";
 
 import { FormSubject } from "./components/FormSubject";
-import { HeaderSubject } from "./components/HeaderSubject/HeaderSubject";
 import { useSubjects } from "./hooks";
 import { DownloadTemplateLink } from "@/components/shared/TemplateDownload";
+import { CirclePlus } from "lucide-react";
+import { ManagementHeader } from "@/components/shared/ ManagementHeader";
 
 export default function SubjectPage() {
   const {
@@ -45,9 +46,15 @@ export default function SubjectPage() {
 
   return (
     <div>
-      <HeaderSubject onCreateClick={() => openModal("create")} />
+      <ManagementHeader
+        title="Gestion Asignatura"
+        description="Crea, actualiza y elimina las materias academicas."
+        buttonLabel="Registrar"
+        buttonIcon={CirclePlus}
+        onButtonClick={() => openModal("create")}
+      />
 
-      <div className="container mx-auto py-10">
+      <div className="pl-10 pr-10">
         {isLoading ? (
           <TableSkeleton />
         ) : (

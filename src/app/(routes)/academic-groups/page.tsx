@@ -1,8 +1,9 @@
 "use client";
 
-import { HeaderAcademicGroups } from "./components/HeaderAcademicGroups";
+import { ManagementHeader } from "@/components/shared/ ManagementHeader";
 import { ClassGroupList } from "./components/ListClassGroup/ClassGroupList";
 import { useAcademicGroup } from "./hook/useClassGroups";
+import { UsersRound } from "lucide-react";
 
 export default function AcademicGroupPage() {
   const {
@@ -28,9 +29,15 @@ export default function AcademicGroupPage() {
 
   return (
     <div className="">
-      <HeaderAcademicGroups onCreateClick={handleCreate} />
+      <ManagementHeader
+        title="Gestión de grupos academicos"
+        description="Registra, elimina, actualiza los grupos de clase por semestre"
+        buttonLabel="Registrar Grupo"
+        buttonIcon={UsersRound}
+        onButtonClick={handleCreate}
+      />
 
-      <div className="container mx-auto py-10">
+      <div className="pl-10 pr-10">
         {" "}
         <ClassGroupList
           isLoading={isLoading}

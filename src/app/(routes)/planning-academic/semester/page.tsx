@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { HeaderSemester } from "./components/HeaderSemester/HeaderSemester";
 import { createColumns } from "./components/ListSemesters/columns";
 import { DataTable } from "./components/ListSemesters/DataTable";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
@@ -16,6 +15,8 @@ import { FormChangeState } from "./components/FormChangeState/FormChangeState";
 import { FormSemester } from "./components/FormSemester";
 import { AlertDialogDestructive } from "@/components/shared/AlertDialogDestructive";
 import { useSemesters } from "./hooks/useSemesters";
+import { ManagementHeader } from "@/components/shared/ ManagementHeader";
+import { CirclePlus } from "lucide-react";
 
 export default function SemesterPage() {
   const {
@@ -43,10 +44,16 @@ export default function SemesterPage() {
   );
 
   return (
-    <div>
-      <HeaderSemester onCreateClick={() => openModal("create")} />
+    <div className="flex flex-1 flex-col">
+      <ManagementHeader
+        title="Gestion semestres"
+        description="Crea, actualiza y cambia el estado a los semestres academicos"
+        buttonLabel="Registrar"
+        buttonIcon={CirclePlus}
+        onButtonClick={() => openModal("create")}
+      />
 
-      <div className="container mx-auto py-10">
+      <div className="pl-10 pr-10">
         {isLoading ? (
           <TableSkeleton />
         ) : (
@@ -61,7 +68,6 @@ export default function SemesterPage() {
         )}
       </div>
 
-      {/* Modal Crear/Editar */}
       <Dialog
         open={modal.type === "create" || modal.type === "edit"}
         onOpenChange={(open) => !open && closeModal()}
