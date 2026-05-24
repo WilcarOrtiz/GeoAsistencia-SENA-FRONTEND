@@ -9,6 +9,8 @@ import { DownloadTemplateLink } from "@/components/shared/TemplateDownload";
 import { ManagementHeader } from "@/components/shared/ ManagementHeader";
 import { UserRoundPlus } from "lucide-react";
 import { BulkImportButton } from "@/components/shared/Bulkimportbutton";
+import { apiClient } from "@/lib/api/api_client";
+import { toast } from "sonner";
 
 export default function UserPage() {
   const {
@@ -28,11 +30,51 @@ export default function UserPage() {
     handleEmailSearch,
     handleRoleFilter,
     handleIsActiveFilter,
+    // selección múltiple
+    selectedIds,
+    setSelectedIds,
+    // acciones masivas
+    handleBulkSendRecoveryEmail,
+    handleBulkChangeState,
+    handleBulkResetDevices,
+    isSendingEmails,
+    isChangingState,
+    isResettingDevices,
   } = useUsers();
 
+  // Acción individual reset dispositivo (desde el dropdown de fila)
+  const handleResetDevices = useMemo(
+    () => async (user: { auth_id: string }) => {
+      try {
+        // apiClient.patch devuelve response.data; Axios lanza en 4xx/5xx.
+        await apiClient.patch("/user/reset-devices", {
+          userIds: [user.auth_id],
+        });
+        toast.success("Dispositivo restablecido correctamente");
+      } catch (error: unknown) {
+        const msg =
+          (error as { response?: { data?: { message?: string } } })?.response
+            ?.data?.message ?? "Error al restablecer el dispositivo";
+        toast.error(msg);
+      }
+    },
+    [],
+  );
+
   const columns = useMemo(
-    () => createColumns(handleSendRecoveryEmail, handleEdit, handleChangeState),
-    [handleSendRecoveryEmail, handleEdit, handleChangeState],
+    () =>
+      createColumns(
+        handleSendRecoveryEmail,
+        handleEdit,
+        handleChangeState,
+        handleResetDevices,
+      ),
+    [
+      handleSendRecoveryEmail,
+      handleEdit,
+      handleChangeState,
+      handleResetDevices,
+    ],
   );
 
   return (
@@ -65,6 +107,16 @@ export default function UserPage() {
             onEmailChange={handleEmailSearch}
             onRoleChange={handleRoleFilter}
             onIsActiveChange={handleIsActiveFilter}
+            // selección múltiple
+            selectedIds={selectedIds}
+            onSelectionChange={setSelectedIds}
+            // acciones masivas
+            onBulkSendRecoveryEmail={handleBulkSendRecoveryEmail}
+            onBulkChangeState={handleBulkChangeState}
+            onBulkResetDevices={handleBulkResetDevices}
+            isSendingEmails={isSendingEmails}
+            isChangingState={isChangingState}
+            isResettingDevices={isResettingDevices}
           />
         )}
         <div className="mt-4">
@@ -78,5 +130,3 @@ export default function UserPage() {
     </div>
   );
 }
-
-<div className="container mx-auto py-10"></div>;

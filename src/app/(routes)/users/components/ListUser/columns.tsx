@@ -1,6 +1,7 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import * as I from "lucide-react";
 import { User } from "@/features/User/user.type";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
@@ -22,7 +24,33 @@ export const createColumns = (
   onSendRecoveryEmail: (user: User) => void,
   onEdit: (user: User) => void,
   onChangeState: (user: User) => void,
+  onResetDevices: (user: User) => void,
 ): ColumnDef<User>[] => [
+  // ── Columna de selección ──────────────────────────────────────────────────
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Seleccionar todos"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Seleccionar fila"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+
+  // ── Columnas de datos ─────────────────────────────────────────────────────
   {
     accessorKey: "is_active",
     header: " ",
@@ -116,7 +144,6 @@ export const createColumns = (
         </div>
       );
     },
-
     accessorFn: (row) => row.roles.map((r) => r.name),
     filterFn: (row, columnId, filterValue) => {
       if (!filterValue) return true;
@@ -124,6 +151,8 @@ export const createColumns = (
       return roles.includes(filterValue as RoleSystem);
     },
   },
+
+  // ── Acciones individuales ─────────────────────────────────────────────────
   {
     id: "actions",
     cell: ({ row }) => {
@@ -150,6 +179,14 @@ export const createColumns = (
               <DropdownMenuItem onClick={() => onSendRecoveryEmail(user)}>
                 <I.Mail className="mr-2 h-4 w-4" />
                 Enviar recuperación
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => onResetDevices(user)}
+                className="text-destructive focus:text-destructive"
+              >
+                <I.SmartphoneNfc className="mr-2 h-4 w-4" />
+                Resetear dispositivo
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

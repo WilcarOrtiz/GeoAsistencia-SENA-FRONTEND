@@ -20,6 +20,15 @@ export function useUsers(limit = 10) {
   const [role, setRole] = useState("");
   const [isActive, setIsActive] = useState("");
 
+  // ── Selección múltiple ──────────────────────────────────────────────────────
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  // Estados de carga para acciones masivas
+  const [isSendingEmails, setIsSendingEmails] = useState(false);
+  const [isChangingState, setIsChangingState] = useState(false);
+  const [isResettingDevices, setIsResettingDevices] = useState(false);
+
+  // ── Query params ────────────────────────────────────────────────────────────
   const queryParams = useMemo(() => {
     const params = new URLSearchParams();
     params.set("page", String(page));
@@ -40,6 +49,7 @@ export function useUsers(limit = 10) {
     },
   });
 
+  // ── Filtros ─────────────────────────────────────────────────────────────────
   const debouncedEmail = useDebouncedCallback((value: string) => {
     setEmail(value);
     setPage(1);
@@ -63,6 +73,7 @@ export function useUsers(limit = 10) {
     setPage(1);
   }, []);
 
+  // ── Navegación ──────────────────────────────────────────────────────────────
   const handleCreate = useCallback(() => {
     router.push("/users/create");
   }, [router]);
@@ -74,6 +85,7 @@ export function useUsers(limit = 10) {
     [router],
   );
 
+  // ── Acciones individuales ───────────────────────────────────────────────────
   const handleSendRecoveryEmail = useCallback(async (user: User) => {
     try {
       const res = await sendRecoveryEmail({ email: user.email });
@@ -90,19 +102,84 @@ export function useUsers(limit = 10) {
   const handleChangeState = useCallback(
     async (user: User) => {
       try {
-        const res = user.is_active
-          ? await apiClient.patch(`/user/${user.auth_id}/deactivate`)
-          : await apiClient.patch(`/user/${user.auth_id}/activate`);
-
-        if (res.ok) {
-          await queryClient.invalidateQueries({ queryKey: ["users"] });
-        }
+        const endpoint = user.is_active ? "deactivate" : "activate";
+        // apiClient.patch devuelve response.data; Axios lanza en 4xx/5xx.
+        await apiClient.patch(`/user/${user.auth_id}/${endpoint}`);
+        await queryClient.invalidateQueries({ queryKey: ["users"] });
       } catch (error) {
         console.error("Error cambiando estado:", error);
       }
     },
     [queryClient],
   );
+
+  // ── Acciones masivas ────────────────────────────────────────────────────────
+  const handleBulkSendRecoveryEmail = useCallback(async () => {
+    if (!selectedIds.length) return;
+    setIsSendingEmails(true);
+    try {
+      const users =
+        data?.data.filter((u) => selectedIds.includes(u.auth_id)) ?? [];
+      const results = await Promise.allSettled(
+        users.map((u) => sendRecoveryEmail({ email: u.email })),
+      );
+      const failed = results.filter((r) => r.status === "rejected").length;
+      if (failed === 0) {
+        toast.success(`Correos enviados a ${users.length} usuario(s)`);
+      } else {
+        toast.warning(`${users.length - failed} enviados, ${failed} fallidos`);
+      }
+      setSelectedIds([]);
+    } catch {
+      toast.error("Error enviando correos masivos");
+    } finally {
+      setIsSendingEmails(false);
+    }
+  }, [selectedIds, data]);
+
+  const handleBulkChangeState = useCallback(
+    async (activate: boolean) => {
+      if (!selectedIds.length) return;
+      setIsChangingState(true);
+      try {
+        const endpoint = activate ? "activate" : "deactivate";
+        await Promise.all(
+          selectedIds.map((id) => apiClient.patch(`/user/${id}/${endpoint}`)),
+        );
+        await queryClient.invalidateQueries({ queryKey: ["users"] });
+        toast.success(
+          `${selectedIds.length} usuario(s) ${activate ? "habilitados" : "inhabilitados"} correctamente`,
+        );
+        setSelectedIds([]);
+      } catch {
+        toast.error("Error al cambiar estado de usuarios");
+      } finally {
+        setIsChangingState(false);
+      }
+    },
+    [selectedIds, queryClient],
+  );
+
+  const handleBulkResetDevices = useCallback(async () => {
+    if (!selectedIds.length) return;
+    setIsResettingDevices(true);
+    try {
+      // apiClient.patch devuelve response.data (ApiResponse), no el Response nativo.
+      // Axios lanza excepción ante 4xx/5xx, así que si llega aquí es éxito.
+      await apiClient.patch("/user/reset-devices", { userIds: selectedIds });
+      toast.success(
+        `Dispositivos restablecidos para ${selectedIds.length} usuario(s)`,
+      );
+      setSelectedIds([]);
+    } catch (error: unknown) {
+      const msg =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ?? "Error al restablecer dispositivos";
+      toast.error(msg);
+    } finally {
+      setIsResettingDevices(false);
+    }
+  }, [selectedIds]);
 
   return useMemo(
     () => ({
@@ -122,6 +199,16 @@ export function useUsers(limit = 10) {
       handleEmailSearch,
       handleRoleFilter,
       handleIsActiveFilter,
+      // selección múltiple
+      selectedIds,
+      setSelectedIds,
+      // acciones masivas
+      handleBulkSendRecoveryEmail,
+      handleBulkChangeState,
+      handleBulkResetDevices,
+      isSendingEmails,
+      isChangingState,
+      isResettingDevices,
     }),
     [
       data,
@@ -138,6 +225,13 @@ export function useUsers(limit = 10) {
       handleEmailSearch,
       handleRoleFilter,
       handleIsActiveFilter,
+      selectedIds,
+      handleBulkSendRecoveryEmail,
+      handleBulkChangeState,
+      handleBulkResetDevices,
+      isSendingEmails,
+      isChangingState,
+      isResettingDevices,
     ],
   );
 }
