@@ -5,6 +5,9 @@ import { Pagination } from "@/components/shared/Pagination";
 import { ClassGroup } from "@/features/classGroup/ClassGroup.type";
 import { ClassGroupFilters } from "./ClassGroupFilters";
 import { ClassGroupGrid } from "./ClassGroupGrid";
+import { Can } from "../../../../../components/shared/Can";
+import { PERMISSIONS } from "@/constants/permissions";
+import { ROLES } from "@/features/roleAndPermission/role.constants";
 
 interface Props {
   data: ClassGroup[];
@@ -19,7 +22,8 @@ interface Props {
   onSemesterChange: (value: string) => void;
   onSubjectChange: (value: string) => void;
   isLoading: boolean;
-  onEdit: (group: ClassGroup, type: "basic" | "schedule") => void;
+  onEditBasic: ((group: ClassGroup) => void) | undefined;
+  onEditSchedule: ((group: ClassGroup) => void) | undefined;
   onDetails: (group: ClassGroup) => void;
 }
 
@@ -35,31 +39,34 @@ export function ClassGroupList({
 
   return (
     <div>
-      <ClassGroupFilters
-        termInput={filterProps.termInput}
-        semester={filterProps.semester}
-        subject={filterProps.subject}
-        onSearch={filterProps.onSearch}
-        onSemesterChange={filterProps.onSemesterChange}
-        onSubjectChange={filterProps.onSubjectChange}
-      />
+      <Can role={ROLES.ADMIN}>
+        <ClassGroupFilters
+          termInput={filterProps.termInput}
+          semester={filterProps.semester}
+          subject={filterProps.subject}
+          onSearch={filterProps.onSearch}
+          onSemesterChange={filterProps.onSemesterChange}
+          onSubjectChange={filterProps.onSubjectChange}
+        />
+      </Can>
 
       <Separator />
-
-      <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        <ClassGroupGrid
-          onDetails={filterProps.onDetails}
-          data={data}
-          isLoading={filterProps.isLoading}
-          onEdit={filterProps.onEdit}
+      <Can permission={PERMISSIONS.VER_GRUPOS}>
+        <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <ClassGroupGrid
+            data={data}
+            isLoading={filterProps.isLoading}
+            onEditBasic={filterProps.onEditBasic}
+            onEditSchedule={filterProps.onEditSchedule}
+            onDetails={filterProps.onDetails}
+          />
+        </div>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
         />
-      </div>
-
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-      />
+      </Can>
     </div>
   );
 }

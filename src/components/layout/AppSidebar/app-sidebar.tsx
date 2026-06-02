@@ -10,7 +10,7 @@ export function AppSidebar({
   ...props
 }: React.ComponentProps<typeof S.Sidebar>) {
   const { user, navigation } = useAuth();
-
+  console.log("navegacion", navigation);
   const userData = user
     ? {
         name: user.fullName,
@@ -22,14 +22,15 @@ export function AppSidebar({
     <S.Sidebar collapsible="icon" {...props}>
       <S.SidebarHeader>
         <div className="flex items-center justify-center pt-3">
-          <Image
-            src="/assets/logotipo.png"
-            alt="EduPin logo"
-            width={100}
-            height={100}
-            priority
-            className="object-contain"
-          />
+          <div className="relative h-[100px] w-[100px]">
+            <Image
+              src="/assets/logotipo.png"
+              alt="EduPin logo"
+              fill
+              sizes="100px"
+              className="object-contain"
+            />
+          </div>
         </div>
       </S.SidebarHeader>
       <S.SidebarContent>

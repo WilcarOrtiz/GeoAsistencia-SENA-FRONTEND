@@ -28,7 +28,7 @@ const LoginPage = () => {
           fill
           priority
           unoptimized
-          quality={100}
+          quality={75}
           sizes="50vw"
           className="object-cover"
         />

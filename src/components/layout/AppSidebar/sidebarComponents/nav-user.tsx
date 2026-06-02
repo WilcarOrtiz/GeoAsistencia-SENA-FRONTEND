@@ -15,7 +15,6 @@ export function NavUser({
     email: string;
   } | null;
 }) {
-  console.log("NavUser recibe:", user);
   const router = useRouter();
   const { isMobile } = S.useSidebar();
 

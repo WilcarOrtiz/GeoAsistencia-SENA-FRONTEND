@@ -22,3 +22,12 @@ export const ROLE_BADGE_VARIANT: Record<
   TEACHER: "secondary",
   STUDENT: "outline",
 };
+
+export const ROLES = {
+  SUPER_ADMIN: "SUPER_ADMIN",
+  ADMIN: "ADMIN",
+  TEACHER: "TEACHER",
+  STUDENT: "STUDENT",
+} as const;
+
+export type Role = (typeof ROLES)[keyof typeof ROLES];

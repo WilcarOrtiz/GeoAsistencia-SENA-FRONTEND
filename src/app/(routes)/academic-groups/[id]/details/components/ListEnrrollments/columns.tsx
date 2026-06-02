@@ -121,16 +121,10 @@ export const columns: ColumnDef<Enrollment>[] = [
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
 
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(student.id)}
+              onClick={() => navigator.clipboard.writeText(student.full_name)}
             >
               Copiar ID
             </DropdownMenuItem>
-
-            <DropdownMenuSeparator />
-
-            <DropdownMenuItem>Ver detalle</DropdownMenuItem>
-
-            <DropdownMenuItem>Ver asistencia</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

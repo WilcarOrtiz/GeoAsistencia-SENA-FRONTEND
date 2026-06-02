@@ -23,6 +23,8 @@ import { ArrowLeftRight, Loader2, UserMinus } from "lucide-react";
 import { useState } from "react";
 import { Enrollment } from "./columns";
 import { TransferModal } from "./TransferModal";
+import { Can } from "../../../../../../../components/shared/Can";
+import { PERMISSIONS } from "@/constants/permissions";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -90,37 +92,41 @@ export function DataTable<TData, TValue>({
         />
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-2"
-            disabled={!hasSelection || isTransferring}
-            onClick={() => setTransferOpen(true)}
-          >
-            <ArrowLeftRight className="h-4 w-4" />
-            Transferir
-            {hasSelection && (
-              <span className="ml-1 text-xs">({selectedIds.length})</span>
-            )}
-          </Button>
+          <Can permission={PERMISSIONS.TRANSFERIR_ESTUDIANTES}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+              disabled={!hasSelection || isTransferring}
+              onClick={() => setTransferOpen(true)}
+            >
+              <ArrowLeftRight className="h-4 w-4" />
+              Transferir
+              {hasSelection && (
+                <span className="ml-1 text-xs">({selectedIds.length})</span>
+              )}
+            </Button>
+          </Can>
 
-          <Button
-            variant="destructive"
-            size="sm"
-            className="flex items-center gap-2"
-            disabled={!hasSelection || isRemoving}
-            onClick={handleRemove}
-          >
-            {isRemoving ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <UserMinus className="h-4 w-4" />
-            )}
-            Dar de baja
-            {hasSelection && (
-              <span className="ml-1 text-xs">({selectedIds.length})</span>
-            )}
-          </Button>
+          <Can permission={PERMISSIONS.RETIRAR_ESTUDIANTES}>
+            <Button
+              variant="destructive"
+              size="sm"
+              className="flex items-center gap-2"
+              disabled={!hasSelection || isRemoving}
+              onClick={handleRemove}
+            >
+              {isRemoving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <UserMinus className="h-4 w-4" />
+              )}
+              Dar de baja
+              {hasSelection && (
+                <span className="ml-1 text-xs">({selectedIds.length})</span>
+              )}
+            </Button>
+          </Can>
         </div>
       </div>
 

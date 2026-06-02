@@ -1,4 +1,3 @@
-// ClassGroupGrid.tsx
 import { ClassGroup } from "@/features/classGroup/ClassGroup.type";
 import { ClassGroupCard } from "../ClassGroupCard/ClassGroupCard";
 import { ClassGroupCardSkeleton } from "@/components/shared/ClassGroupCardSkeleton";
@@ -6,13 +5,20 @@ import { ClassGroupCardSkeleton } from "@/components/shared/ClassGroupCardSkelet
 type Props = {
   data: ClassGroup[];
   isLoading: boolean;
-  onEdit: (group: ClassGroup, type: "basic" | "schedule") => void;
+  onEditBasic: ((group: ClassGroup) => void) | undefined;
+  onEditSchedule: ((group: ClassGroup) => void) | undefined;
   onDetails: (group: ClassGroup) => void;
 };
 
 const SKELETON_COUNT = 6;
 
-export function ClassGroupGrid({ data, isLoading, onEdit, onDetails }: Props) {
+export function ClassGroupGrid({
+  data,
+  isLoading,
+  onEditBasic,
+  onEditSchedule,
+  onDetails,
+}: Props) {
   if (isLoading && data.length === 0) {
     return (
       <>
@@ -46,7 +52,10 @@ export function ClassGroupGrid({ data, isLoading, onEdit, onDetails }: Props) {
           total_students={group.total_students ?? 0}
           max_students={group.max_students ?? 0}
           is_active={group.is_active}
-          onEdit={(type) => onEdit(group, type)}
+          onEditBasic={onEditBasic ? () => onEditBasic(group) : undefined}
+          onEditSchedule={
+            onEditSchedule ? () => onEditSchedule(group) : undefined
+          }
           onDetails={() => onDetails(group)}
         />
       ))}

@@ -20,8 +20,13 @@ import { DownloadTemplateLink } from "@/components/shared/TemplateDownload";
 import { CirclePlus } from "lucide-react";
 import { ManagementHeader } from "@/components/shared/ ManagementHeader";
 import { BulkImportButton } from "@/components/shared/Bulkimportbutton";
+import { Can } from "../../../../components/shared/Can";
+import { PERMISSIONS } from "@/constants/permissions";
+import { usePermissions } from "@/hooks/usePermission";
 
 export default function SubjectPage() {
+  const { can } = usePermissions();
+
   const {
     subjects,
     total,
@@ -39,10 +44,15 @@ export default function SubjectPage() {
   const columns = useMemo(
     () =>
       createColumns(
-        (subject) => openModal("edit", subject),
-        (id) => openModal("delete", { id } as never),
+        can(PERMISSIONS.EDITAR_ASIGNATURA)
+          ? (subject) => openModal("edit", subject)
+          : undefined,
+
+        can(PERMISSIONS.ELIMINAR_ASIGNATURA)
+          ? (id) => openModal("delete", { id } as never)
+          : undefined,
       ),
-    [openModal],
+    [can, openModal],
   );
 
   return (
@@ -50,14 +60,20 @@ export default function SubjectPage() {
       <ManagementHeader
         title="Gestion Asignatura"
         description="Crea, actualiza y elimina las materias academicas."
-        buttonLabel="Registrar"
+        buttonLabel={
+          can(PERMISSIONS.CREAR_ASIGNATURA)
+            ? "Agregar nueva asignatura"
+            : undefined
+        }
         buttonIcon={CirclePlus}
         onButtonClick={() => openModal("create")}
         extraActions={
-          <BulkImportButton
-            endpoint="/subjects/bulk/import"
-            queryKey="subjects"
-          />
+          <Can permission={PERMISSIONS.IMPORTAR_ASIGNATURAS}>
+            <BulkImportButton
+              endpoint="/subjects/bulk/import"
+              queryKey="subjects"
+            />
+          </Can>
         }
       />
 
@@ -65,21 +81,26 @@ export default function SubjectPage() {
         {isLoading ? (
           <TableSkeleton />
         ) : (
-          <DataTable
-            columns={columns}
-            data={subjects}
-            total={total}
-            page={page}
-            limit={limit}
-            onPageChange={setPage}
-          />
+          <Can permission={PERMISSIONS.VER_ASIGNATURAS}>
+            <DataTable
+              columns={columns}
+              data={subjects}
+              total={total}
+              page={page}
+              limit={limit}
+              onPageChange={setPage}
+            />
+          </Can>
         )}
-        <div className="mt-4">
-          <DownloadTemplateLink
-            endpoint="/subjects/bulk/template"
-            label="Asignaturas"
-          />
-        </div>
+
+        <Can permission={PERMISSIONS.DESCARGAR_PLANTILLA_ASIGNATURAS}>
+          <div className="mt-4">
+            <DownloadTemplateLink
+              endpoint="/subjects/bulk/template"
+              label="Asignaturas"
+            />
+          </div>
+        </Can>
       </div>
 
       {/* Modal Crear/Editar */}

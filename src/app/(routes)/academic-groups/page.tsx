@@ -4,8 +4,12 @@ import { ManagementHeader } from "@/components/shared/ ManagementHeader";
 import { ClassGroupList } from "./components/ListClassGroup/ClassGroupList";
 import { useAcademicGroup } from "./hook/useClassGroups";
 import { UsersRound } from "lucide-react";
+import { PERMISSIONS } from "@/constants/permissions";
+import { usePermissions } from "@/hooks/usePermission";
 
 export default function AcademicGroupPage() {
+  const { can } = usePermissions();
+
   const {
     groups,
     total,
@@ -13,17 +17,14 @@ export default function AcademicGroupPage() {
     limit,
     setPage,
     isLoading,
-
     termInput,
     semester,
     subject,
-
     handleSearch,
     handleSemesterFilter,
     handleSubjectFilter,
     handleEdit,
     handleDetails,
-
     handleCreate,
   } = useAcademicGroup();
 
@@ -32,13 +33,14 @@ export default function AcademicGroupPage() {
       <ManagementHeader
         title="Gestión de grupos academicos"
         description="Registra, elimina, actualiza los grupos de clase por semestre"
-        buttonLabel="Registrar Grupo"
+        buttonLabel={
+          can(PERMISSIONS.CREAR_GRUPO) ? "Registrar grupo academico" : undefined
+        }
         buttonIcon={UsersRound}
         onButtonClick={handleCreate}
       />
 
       <div className="pl-10 pr-10">
-        {" "}
         <ClassGroupList
           isLoading={isLoading}
           data={groups}
@@ -52,7 +54,16 @@ export default function AcademicGroupPage() {
           onSearch={handleSearch}
           onSemesterChange={handleSemesterFilter}
           onSubjectChange={handleSubjectFilter}
-          onEdit={handleEdit}
+          onEditBasic={
+            can(PERMISSIONS.EDITAR_GRUPO)
+              ? (g) => handleEdit(g, "basic")
+              : undefined
+          }
+          onEditSchedule={
+            can(PERMISSIONS.GESTIONAR_HORARIOS)
+              ? (g) => handleEdit(g, "schedule")
+              : undefined
+          }
           onDetails={handleDetails}
         />
       </div>

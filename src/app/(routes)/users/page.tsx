@@ -11,8 +11,13 @@ import { UserRoundPlus } from "lucide-react";
 import { BulkImportButton } from "@/components/shared/Bulkimportbutton";
 import { apiClient } from "@/lib/api/api_client";
 import { toast } from "sonner";
+import { Can } from "../../../components/shared/Can";
+import { PERMISSIONS } from "@/constants/permissions";
+import { usePermissions } from "@/hooks/usePermission";
 
 export default function UserPage() {
+  const { can } = usePermissions();
+
   const {
     users,
     total,
@@ -30,10 +35,10 @@ export default function UserPage() {
     handleEmailSearch,
     handleRoleFilter,
     handleIsActiveFilter,
-    // selección múltiple
+
     selectedIds,
     setSelectedIds,
-    // acciones masivas
+
     handleBulkSendRecoveryEmail,
     handleBulkChangeState,
     handleBulkResetDevices,
@@ -42,11 +47,9 @@ export default function UserPage() {
     isResettingDevices,
   } = useUsers();
 
-  // Acción individual reset dispositivo (desde el dropdown de fila)
   const handleResetDevices = useMemo(
     () => async (user: { auth_id: string }) => {
       try {
-        // apiClient.patch devuelve response.data; Axios lanza en 4xx/5xx.
         await apiClient.patch("/user/reset-devices", {
           userIds: [user.auth_id],
         });
@@ -60,16 +63,20 @@ export default function UserPage() {
     },
     [],
   );
-
   const columns = useMemo(
     () =>
       createColumns(
-        handleSendRecoveryEmail,
-        handleEdit,
-        handleChangeState,
-        handleResetDevices,
+        can(PERMISSIONS.RECUPERAR_PASSWORD)
+          ? handleSendRecoveryEmail
+          : undefined,
+        can(PERMISSIONS.EDITAR_USUARIO) ? handleEdit : undefined,
+        can(PERMISSIONS.ACTIVAR_USUARIO) || can(PERMISSIONS.DESACTIVAR_USUARIO)
+          ? handleChangeState
+          : undefined,
+        can(PERMISSIONS.RECUPERAR_PASSWORD) ? handleResetDevices : undefined,
       ),
     [
+      can,
       handleSendRecoveryEmail,
       handleEdit,
       handleChangeState,
@@ -82,11 +89,15 @@ export default function UserPage() {
       <ManagementHeader
         title="Gestión Usuario"
         description="Gestiona todo lo referente a los usuarios, incluyendo la asignacion de roles"
-        buttonLabel="Agregar nuevo usuario"
+        buttonLabel={
+          can(PERMISSIONS.CREAR_USUARIO) ? "Agregar nuevo usuario" : undefined
+        }
         buttonIcon={UserRoundPlus}
         onButtonClick={handleCreate}
         extraActions={
-          <BulkImportButton endpoint="/user/bulk/import" queryKey="users" />
+          <Can permission={PERMISSIONS.IMPORTAR_USUARIOS}>
+            <BulkImportButton endpoint="/user/bulk/import" queryKey="users" />
+          </Can>
         }
       />
 
@@ -94,38 +105,39 @@ export default function UserPage() {
         {isLoading ? (
           <TableSkeleton />
         ) : (
-          <DataTable
-            columns={columns}
-            data={users}
-            total={total}
-            page={page}
-            limit={limit}
-            onPageChange={setPage}
-            emailInput={emailInput}
-            role={role}
-            isActive={isActive}
-            onEmailChange={handleEmailSearch}
-            onRoleChange={handleRoleFilter}
-            onIsActiveChange={handleIsActiveFilter}
-            // selección múltiple
-            selectedIds={selectedIds}
-            onSelectionChange={setSelectedIds}
-            // acciones masivas
-            onBulkSendRecoveryEmail={handleBulkSendRecoveryEmail}
-            onBulkChangeState={handleBulkChangeState}
-            onBulkResetDevices={handleBulkResetDevices}
-            isSendingEmails={isSendingEmails}
-            isChangingState={isChangingState}
-            isResettingDevices={isResettingDevices}
-          />
+          <Can permission={PERMISSIONS.VER_USUARIOS}>
+            <DataTable
+              columns={columns}
+              data={users}
+              total={total}
+              page={page}
+              limit={limit}
+              onPageChange={setPage}
+              emailInput={emailInput}
+              role={role}
+              isActive={isActive}
+              onEmailChange={handleEmailSearch}
+              onRoleChange={handleRoleFilter}
+              onIsActiveChange={handleIsActiveFilter}
+              selectedIds={selectedIds}
+              onSelectionChange={setSelectedIds}
+              onBulkSendRecoveryEmail={handleBulkSendRecoveryEmail}
+              onBulkChangeState={handleBulkChangeState}
+              onBulkResetDevices={handleBulkResetDevices}
+              isSendingEmails={isSendingEmails}
+              isChangingState={isChangingState}
+              isResettingDevices={isResettingDevices}
+            />
+          </Can>
         )}
-        <div className="mt-4">
-          {" "}
-          <DownloadTemplateLink
-            endpoint="/user/bulk/template"
-            label="Usuarios"
-          />
-        </div>
+        <Can permission={PERMISSIONS.DESCARGAR_PLANTILLA_USUARIOS}>
+          <div className="mt-4">
+            <DownloadTemplateLink
+              endpoint="/user/bulk/template"
+              label="Usuarios"
+            />
+          </div>
+        </Can>
       </div>
     </div>
   );

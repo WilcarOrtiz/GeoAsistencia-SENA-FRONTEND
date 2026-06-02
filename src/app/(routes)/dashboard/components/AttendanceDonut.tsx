@@ -49,7 +49,7 @@ export function AttendanceDonut({ data, isLoading }: Props) {
               </p>
             </div>
 
-            <div className="relative flex-1">
+            <div className="relative h-[240px] w-full min-w-0">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <defs>

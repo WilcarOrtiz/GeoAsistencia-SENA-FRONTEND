@@ -33,7 +33,6 @@ export function UserTableFilters({
 }: Props) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-end gap-3 py-4">
-      {/* EMAIL */}
       <div className="flex flex-col gap-1">
         <span className="text-xs text-muted-foreground">Correo</span>
         <Input
@@ -45,10 +44,8 @@ export function UserTableFilters({
       </div>
 
       <div className="flex gap-3 flex-col xs:flex-row sm:flex-row">
-        {/* ROL */}
         <div className="flex flex-col gap-1">
           <span className="text-xs text-muted-foreground">Rol</span>
-
           <GenericSelect
             options={[
               { label: "Todos", value: "all" },
@@ -63,15 +60,12 @@ export function UserTableFilters({
           />
         </div>
 
-        {/* ESTADO */}
         <div className="flex flex-col gap-1">
           <span className="text-xs text-muted-foreground">Estado</span>
-
           <Select value={isActive || "all"} onValueChange={onIsActiveChange}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Todos" />
             </SelectTrigger>
-
             <SelectContent>
               <SelectItem value="all">Todos</SelectItem>
               <SelectItem value="true">Activos</SelectItem>

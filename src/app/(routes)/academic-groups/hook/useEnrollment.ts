@@ -26,11 +26,6 @@ export function useEnrollments(groupId?: string) {
 
   const { mutateAsync: removeStudents, isPending: isRemoving } = useMutation({
     mutationFn: (studentIds: string[]) => {
-      console.log("📤 Enviando:", {
-        groupId,
-        studentIds,
-      });
-
       return apiClient.patch(`/enrollment/remove`, {
         toGroupId: groupId,
         students: studentIds,

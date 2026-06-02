@@ -28,6 +28,8 @@ import { MetricCard } from "@/components/shared/MetricCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AttendanceHistoryTable } from "./components/AttendanceHistoryTable/AttendanceHistoryTable";
 import { useClassSessions } from "../../hook/useClassSesions";
+import { Can } from "../../../../../components/shared/Can";
+import { PERMISSIONS } from "@/constants/permissions";
 
 export default function DetailscademicGroupPage() {
   const router = useRouter();
@@ -107,20 +109,21 @@ export default function DetailscademicGroupPage() {
             </span>
           </p>
         </div>
+        <Can permission={PERMISSIONS.MATRICULAR_ESTUDIANTES}>
+          <div className="flex items-center gap-10">
+            <DownloadTemplateLink
+              endpoint="/enrollment/bulk/template"
+              label="Estudiantes"
+            />
 
-        <div className="flex items-center gap-10">
-          <DownloadTemplateLink
-            endpoint="/enrollment/bulk/template"
-            label="Estudiantes"
-          />
-
-          <BulkImportButton
-            endpoint={`/enrollment/bulk/import/${groupId}`}
-            queryKey={["enrollment", groupId]}
-            extraQueryKeys={[["class-group", groupId]]}
-            label="Matricular estudiante(s)"
-          />
-        </div>
+            <BulkImportButton
+              endpoint={`/enrollment/bulk/import/${groupId}`}
+              queryKey={["enrollment", groupId]}
+              extraQueryKeys={[["class-group", groupId]]}
+              label="Matricular estudiante(s)"
+            />
+          </div>
+        </Can>
       </div>
 
       {/* STATS */}
@@ -154,21 +157,27 @@ export default function DetailscademicGroupPage() {
           />
         ))}
       </div>
-      {/*Lista de asistencia y lista de clase*/}
 
+      {/*Lista de asistencia y lista de clase*/}
       <Tabs defaultValue="enrollments" className="w-full">
         <TabsList className="mb-4">
-          <TabsTrigger value="enrollments">Lista de estudiantes</TabsTrigger>
+          <Can permission={PERMISSIONS.VER_ESTUDIANTES_GRUPO}>
+            {" "}
+            <TabsTrigger value="enrollments">Lista de estudiantes</TabsTrigger>
+          </Can>
+
           <TabsTrigger value="attendance">Historial de asistencias</TabsTrigger>
         </TabsList>
 
         <TabsContent value="enrollments">
-          <ListEnrollment
-            id={groupId}
-            students={students}
-            isLoading={isLoadingStudents}
-            {...rest}
-          />
+          <Can permission={PERMISSIONS.VER_ESTUDIANTES_GRUPO}>
+            <ListEnrollment
+              id={groupId}
+              students={students}
+              isLoading={isLoadingStudents}
+              {...rest}
+            />
+          </Can>
         </TabsContent>
 
         <TabsContent value="attendance">

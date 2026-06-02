@@ -9,6 +9,7 @@ export type Props = {
   max_students: number;
   is_active: boolean;
   total_sessions: number;
-  onEdit: (type: "basic" | "schedule") => void;
+  onEditBasic: (() => void) | undefined;
+  onEditSchedule: (() => void) | undefined;
   onDetails: () => void;
 };

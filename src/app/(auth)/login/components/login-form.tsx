@@ -105,7 +105,7 @@ const LoginForm = ({ className, ...props }: React.ComponentProps<"form">) => {
 
         <F.Field>
           <F.FieldDescription className="text-small px-6 text-center">
-            aquí va el eslogan
+            Gestiona la asistencia, Toma mejores decisiones.
           </F.FieldDescription>
         </F.Field>
       </F.FieldGroup>

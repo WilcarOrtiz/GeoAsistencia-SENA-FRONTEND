@@ -18,7 +18,8 @@ export function ClassGroupCard({
   max_students,
   total_sessions,
   is_active,
-  onEdit,
+  onEditBasic,
+  onEditSchedule,
   onDetails,
 }: Props) {
   const percentage = (total_students / max_students) * 100;
@@ -29,7 +30,6 @@ export function ClassGroupCard({
       className="rounded-2xl shadow-sm border p-4 space-y-4"
     >
       <CardContent className="p-0 space-y-4">
-        {/* Header */}
         <div className="flex justify-between items-start relative">
           <div>
             <p className="text-xs text-muted-foreground">
@@ -49,43 +49,48 @@ export function ClassGroupCard({
               {is_active ? "ACTIVE" : "INACTIVE"}
             </Badge>
 
-            <DM.DropdownMenu>
-              <DM.DropdownMenuTrigger
-                onClick={(e) => e.stopPropagation()}
-                asChild
-              >
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DM.DropdownMenuTrigger>
-              <DM.DropdownMenuContent align="end">
-                <DM.DropdownMenuLabel>Acciones</DM.DropdownMenuLabel>
-                <DM.DropdownMenuItem onClick={() => onEdit("basic")}>
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Editar información
-                </DM.DropdownMenuItem>
-                <DM.DropdownMenuItem onClick={() => onEdit("schedule")}>
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Editar horarios
-                </DM.DropdownMenuItem>
-              </DM.DropdownMenuContent>
-            </DM.DropdownMenu>
+            {(onEditBasic || onEditSchedule) && (
+              <DM.DropdownMenu>
+                <DM.DropdownMenuTrigger
+                  onClick={(e) => e.stopPropagation()}
+                  asChild
+                >
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DM.DropdownMenuTrigger>
+                <DM.DropdownMenuContent align="end">
+                  <DM.DropdownMenuLabel>Acciones</DM.DropdownMenuLabel>
+
+                  {onEditBasic && (
+                    <DM.DropdownMenuItem onClick={onEditBasic}>
+                      <Pencil className="mr-2 h-4 w-4" />
+                      Editar información
+                    </DM.DropdownMenuItem>
+                  )}
+
+                  {onEditSchedule && (
+                    <DM.DropdownMenuItem onClick={onEditSchedule}>
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Editar horarios
+                    </DM.DropdownMenuItem>
+                  )}
+                </DM.DropdownMenuContent>
+              </DM.DropdownMenu>
+            )}
           </div>
         </div>
 
-        {/* Tags */}
         <div className="flex gap-2 flex-wrap">
           <Badge variant="outline">{subject}</Badge>
           <Badge variant="outline">{semester}</Badge>
         </div>
 
-        {/* Instructor + Enrollment */}
         <div className="flex justify-between items-center bg-muted p-3 rounded-xl">
           <div>
             <p className="text-xs text-muted-foreground">INSTRUCTOR</p>
             <p className="font-medium">{teacher}</p>
           </div>
-
           <div className="text-right">
             <p className="text-xs text-muted-foreground">
               Alumnos Matriculados
@@ -96,7 +101,6 @@ export function ClassGroupCard({
           </div>
         </div>
 
-        {/* Progress bar */}
         <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
           <div
             className="h-full bg-primary rounded-full transition-all"

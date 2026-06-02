@@ -21,12 +21,11 @@ import {
 import { cn } from "@/lib/utils";
 
 export const createColumns = (
-  onSendRecoveryEmail: (user: User) => void,
-  onEdit: (user: User) => void,
-  onChangeState: (user: User) => void,
-  onResetDevices: (user: User) => void,
+  onSendRecoveryEmail: ((user: User) => void) | undefined,
+  onEdit: ((user: User) => void) | undefined,
+  onChangeState: ((user: User) => void) | undefined,
+  onResetDevices: ((user: User) => void) | undefined,
 ): ColumnDef<User>[] => [
-  // ── Columna de selección ──────────────────────────────────────────────────
   {
     id: "select",
     header: ({ table }) => (
@@ -50,7 +49,6 @@ export const createColumns = (
     enableHiding: false,
   },
 
-  // ── Columnas de datos ─────────────────────────────────────────────────────
   {
     accessorKey: "is_active",
     header: " ",
@@ -151,12 +149,12 @@ export const createColumns = (
       return roles.includes(filterValue as RoleSystem);
     },
   },
-
-  // ── Acciones individuales ─────────────────────────────────────────────────
   {
     id: "actions",
     cell: ({ row }) => {
       const user = row.original;
+      if (!onEdit && !onChangeState && !onSendRecoveryEmail && !onResetDevices)
+        return null;
 
       return (
         <div className="flex items-center gap-1">
@@ -168,26 +166,38 @@ export const createColumns = (
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => onEdit(user)}>
-                <I.Pencil className="mr-2 h-4 w-4" />
-                Editar
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onChangeState(user)}>
-                <I.RefreshCw className="mr-2 h-4 w-4" />
-                {!user.is_active ? "Habilitar" : "Inhabilitar"}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onSendRecoveryEmail(user)}>
-                <I.Mail className="mr-2 h-4 w-4" />
-                Enviar recuperación
-              </DropdownMenuItem>
+
+              {onEdit && (
+                <DropdownMenuItem onClick={() => onEdit(user)}>
+                  <I.Pencil className="mr-2 h-4 w-4" />
+                  Editar
+                </DropdownMenuItem>
+              )}
+
+              {onChangeState && (
+                <DropdownMenuItem onClick={() => onChangeState(user)}>
+                  <I.RefreshCw className="mr-2 h-4 w-4" />
+                  {!user.is_active ? "Habilitar" : "Inhabilitar"}
+                </DropdownMenuItem>
+              )}
+
+              {onSendRecoveryEmail && (
+                <DropdownMenuItem onClick={() => onSendRecoveryEmail(user)}>
+                  <I.Mail className="mr-2 h-4 w-4" />
+                  Enviar recuperación
+                </DropdownMenuItem>
+              )}
+
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => onResetDevices(user)}
-                className="text-destructive focus:text-destructive"
-              >
-                <I.SmartphoneNfc className="mr-2 h-4 w-4" />
-                Resetear dispositivo
-              </DropdownMenuItem>
+              {onResetDevices && (
+                <DropdownMenuItem
+                  onClick={() => onResetDevices(user)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <I.SmartphoneNfc className="mr-2 h-4 w-4" />
+                  Resetear dispositivo
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

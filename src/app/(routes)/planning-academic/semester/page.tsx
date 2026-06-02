@@ -17,8 +17,13 @@ import { AlertDialogDestructive } from "@/components/shared/AlertDialogDestructi
 import { useSemesters } from "./hooks/useSemesters";
 import { ManagementHeader } from "@/components/shared/ ManagementHeader";
 import { CirclePlus } from "lucide-react";
+import { Can } from "@/components/shared/Can";
+import { usePermissions } from "@/hooks/usePermission";
+import { PERMISSIONS } from "@/constants/permissions";
 
 export default function SemesterPage() {
+  const { can } = usePermissions();
+
   const {
     semesters,
     total,
@@ -36,11 +41,17 @@ export default function SemesterPage() {
   const columns = useMemo(
     () =>
       createColumns(
-        (semester) => openModal("edit", semester),
-        (semester) => openModal("changeState", semester),
-        (id) => openModal("delete", { id } as never),
+        can(PERMISSIONS.EDITAR_SEMESTRE)
+          ? (semester) => openModal("edit", semester)
+          : undefined,
+        can(PERMISSIONS.CAMBIAR_ESTADO_SEMESTRE)
+          ? (semester) => openModal("changeState", semester)
+          : undefined,
+        can(PERMISSIONS.ELIMINAR_SEMESTRE)
+          ? (id) => openModal("delete", { id } as never)
+          : undefined,
       ),
-    [openModal],
+    [can, openModal],
   );
 
   return (
@@ -48,7 +59,9 @@ export default function SemesterPage() {
       <ManagementHeader
         title="Gestion semestres"
         description="Crea, actualiza y cambia el estado a los semestres academicos"
-        buttonLabel="Registrar"
+        buttonLabel={
+          can(PERMISSIONS.CREAR_SEMESTRE) ? "Agregar nuevo semestre" : undefined
+        }
         buttonIcon={CirclePlus}
         onButtonClick={() => openModal("create")}
       />
@@ -57,14 +70,16 @@ export default function SemesterPage() {
         {isLoading ? (
           <TableSkeleton />
         ) : (
-          <DataTable
-            columns={columns}
-            data={semesters}
-            total={total}
-            page={page}
-            limit={limit}
-            onPageChange={setPage}
-          />
+          <Can permission={PERMISSIONS.VER_SEMESTRES}>
+            <DataTable
+              columns={columns}
+              data={semesters}
+              total={total}
+              page={page}
+              limit={limit}
+              onPageChange={setPage}
+            />
+          </Can>
         )}
       </div>
 

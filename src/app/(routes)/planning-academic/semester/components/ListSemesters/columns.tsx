@@ -12,9 +12,9 @@ import { Button } from "@/components/ui/button";
 import * as I from "lucide-react";
 
 export const createColumns = (
-  onEdit: (semester: Semester) => void,
-  onChangeState: (semester: Semester) => void,
-  onDelete: (id: string) => void,
+  onEdit: ((semester: Semester) => void) | undefined,
+  onChangeState: ((semester: Semester) => void) | undefined,
+  onDelete: ((id: string) => void) | undefined,
 ): ColumnDef<Semester>[] => [
   { accessorKey: "code", header: "Código" },
   {
@@ -58,38 +58,48 @@ export const createColumns = (
       const semester = row.original;
       const isLocked = ["finished", "canceled"].includes(semester.state);
 
+      if (!onEdit && !onChangeState && !onDelete) return null;
+
       return (
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-destructive hover:text-destructive"
-            onClick={() => onDelete(semester.id)}
-          >
-            <I.Trash2 className="h-4 w-4" />
-          </Button>
+          {onDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-destructive hover:text-destructive"
+              onClick={() => onDelete(semester.id)}
+            >
+              <I.Trash2 className="h-4 w-4" />
+            </Button>
+          )}
 
-          <D.DropdownMenu>
-            <D.DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <I.MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </D.DropdownMenuTrigger>
-            <D.DropdownMenuContent align="end">
-              <D.DropdownMenuLabel>Acciones</D.DropdownMenuLabel>
-              <D.DropdownMenuItem
-                onClick={() => onEdit(semester)}
-                disabled={isLocked}
-              >
-                <I.Pencil className="mr-2 h-4 w-4" />
-                Editar
-              </D.DropdownMenuItem>
-              <D.DropdownMenuItem onClick={() => onChangeState(semester)}>
-                <I.RefreshCw className="mr-2 h-4 w-4" />
-                Cambiar estado
-              </D.DropdownMenuItem>
-            </D.DropdownMenuContent>
-          </D.DropdownMenu>
+          {(onEdit || onChangeState) && (
+            <D.DropdownMenu>
+              <D.DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <I.MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </D.DropdownMenuTrigger>
+              <D.DropdownMenuContent align="end">
+                <D.DropdownMenuLabel>Acciones</D.DropdownMenuLabel>
+
+                {onEdit && (
+                  <D.DropdownMenuItem
+                    onClick={() => onEdit(semester)}
+                    disabled={isLocked}
+                  >
+                    <I.Pencil className="mr-2 h-4 w-4" /> Editar
+                  </D.DropdownMenuItem>
+                )}
+
+                {onChangeState && (
+                  <D.DropdownMenuItem onClick={() => onChangeState(semester)}>
+                    <I.RefreshCw className="mr-2 h-4 w-4" /> Cambiar estado
+                  </D.DropdownMenuItem>
+                )}
+              </D.DropdownMenuContent>
+            </D.DropdownMenu>
+          )}
         </div>
       );
     },

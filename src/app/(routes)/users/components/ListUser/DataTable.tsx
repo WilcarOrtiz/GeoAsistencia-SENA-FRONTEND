@@ -31,6 +31,8 @@ import { useState } from "react";
 import { Pagination } from "@/components/shared/Pagination";
 import { UserTableFilters } from "./UserTableFilters";
 import { User } from "@/features/User/user.type";
+import { Can } from "../../../../../components/shared/Can";
+import { PERMISSIONS } from "@/constants/permissions";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -45,10 +47,10 @@ interface DataTableProps<TData, TValue> {
   onEmailChange: (value: string) => void;
   onRoleChange: (value: string) => void;
   onIsActiveChange: (value: string) => void;
-  // selección múltiple
+
   selectedIds: string[];
   onSelectionChange: (ids: string[]) => void;
-  // acciones masivas
+
   onBulkSendRecoveryEmail: () => Promise<void>;
   onBulkChangeState: (activate: boolean) => Promise<void>;
   onBulkResetDevices: () => Promise<void>;
@@ -84,7 +86,6 @@ export function DataTable<TData, TValue>({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
-  // Construir rowSelection a partir del array de ids del hook
   const rowSelection: RowSelectionState = (data as User[]).reduce(
     (acc, user, index) => {
       if (selectedIds.includes(user.auth_id)) acc[index] = true;
@@ -101,11 +102,9 @@ export function DataTable<TData, TValue>({
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: (updater) => {
-      // Resolver el nuevo estado de selección
       const newSelection =
         typeof updater === "function" ? updater(rowSelection) : updater;
 
-      // Mapear índices seleccionados → auth_ids
       const newIds = Object.keys(newSelection)
         .filter((key) => newSelection[key])
         .map((index) => (data[Number(index)] as User).auth_id);
@@ -130,7 +129,6 @@ export function DataTable<TData, TValue>({
         onIsActiveChange={onIsActiveChange}
       />
 
-      {/* ── Barra de acciones masivas ──────────────────────────────────────── */}
       <div
         className={`flex items-center justify-between gap-3 rounded-md border px-3 py-2 mb-2 transition-all duration-200 ${
           hasSelection
@@ -145,85 +143,88 @@ export function DataTable<TData, TValue>({
         </span>
 
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Enviar correo de recuperación */}
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={!hasSelection || isBusy}
-            onClick={onBulkSendRecoveryEmail}
-            className="flex items-center gap-2"
-          >
-            {isSendingEmails ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Mail className="h-4 w-4" />
-            )}
-            Enviar recuperación
-            {hasSelection && (
-              <span className="ml-1 text-xs">({selectedIds.length})</span>
-            )}
-          </Button>
+          <Can permission={PERMISSIONS.RECUPERAR_PASSWORD}>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!hasSelection || isBusy}
+              onClick={onBulkSendRecoveryEmail}
+              className="flex items-center gap-2"
+            >
+              {isSendingEmails ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Mail className="h-4 w-4" />
+              )}
+              Enviar recuperación
+              {hasSelection && (
+                <span className="ml-1 text-xs">({selectedIds.length})</span>
+              )}
+            </Button>
+          </Can>
 
-          {/* Habilitar */}
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={!hasSelection || isBusy}
-            onClick={() => onBulkChangeState(true)}
-            className="flex items-center gap-2"
-          >
-            {isChangingState ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <ToggleRight className="h-4 w-4 text-green-600" />
-            )}
-            Habilitar
-            {hasSelection && (
-              <span className="ml-1 text-xs">({selectedIds.length})</span>
-            )}
-          </Button>
+          <Can permission={PERMISSIONS.ACTIVAR_USUARIO}>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!hasSelection || isBusy}
+              onClick={() => onBulkChangeState(true)}
+              className="flex items-center gap-2"
+            >
+              {isChangingState ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ToggleRight className="h-4 w-4 text-green-600" />
+              )}
+              Habilitar
+              {hasSelection && (
+                <span className="ml-1 text-xs">({selectedIds.length})</span>
+              )}
+            </Button>
+          </Can>
 
-          {/* Inhabilitar */}
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={!hasSelection || isBusy}
-            onClick={() => onBulkChangeState(false)}
-            className="flex items-center gap-2"
-          >
-            {isChangingState ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <ToggleLeft className="h-4 w-4 text-orange-500" />
-            )}
-            Inhabilitar
-            {hasSelection && (
-              <span className="ml-1 text-xs">({selectedIds.length})</span>
-            )}
-          </Button>
+          <Can permission={PERMISSIONS.DESACTIVAR_USUARIO}>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!hasSelection || isBusy}
+              onClick={() => onBulkChangeState(false)}
+              className="flex items-center gap-2"
+            >
+              {isChangingState ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ToggleLeft className="h-4 w-4 text-orange-500" />
+              )}
+              Inhabilitar
+              {hasSelection && (
+                <span className="ml-1 text-xs">({selectedIds.length})</span>
+              )}
+            </Button>
+          </Can>
 
-          {/* Resetear dispositivos */}
-          <Button
-            variant="destructive"
-            size="sm"
-            disabled={!hasSelection || isBusy}
-            onClick={onBulkResetDevices}
-            className="flex items-center gap-2"
-          >
-            {isResettingDevices ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <SmartphoneNfc className="h-4 w-4" />
-            )}
-            Resetear dispositivos
-            {hasSelection && (
-              <span className="ml-1 text-xs">({selectedIds.length})</span>
-            )}
-          </Button>
+          <Can permission={PERMISSIONS.RECUPERAR_PASSWORD}>
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={!hasSelection || isBusy}
+              onClick={onBulkResetDevices}
+              className="flex items-center gap-2"
+            >
+              {isResettingDevices ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <SmartphoneNfc className="h-4 w-4" />
+              )}
+              Resetear dispositivos
+              {hasSelection && (
+                <span className="ml-1 text-xs">({selectedIds.length})</span>
+              )}
+            </Button>
+          </Can>
         </div>
       </div>
 
-      {/* ── Tabla ─────────────────────────────────────────────────────────── */}
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
@@ -274,7 +275,6 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      {/* ── Footer: contador + paginación ────────────────────────────────── */}
       <div className="flex items-center justify-between gap-4 pt-2">
         <span className="text-sm text-muted-foreground">
           {selectedIds.length} de {total} fila(s) seleccionadas.

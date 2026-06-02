@@ -37,7 +37,6 @@ const ForgotPasswordForm = () => {
       const res = await isUserActive(values.email);
 
       if (!res) {
-        console.log("respuesta", res);
         toast.error("Usuario inactivo o no registrado");
         router.push("/error");
         setLoading(false);

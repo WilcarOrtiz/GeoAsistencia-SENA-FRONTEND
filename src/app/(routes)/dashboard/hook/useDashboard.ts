@@ -12,21 +12,18 @@ import {
   SubjectRanking,
 } from "@/features/dashboard/dashboard.types";
 
-type Role = "TEACHER" | "ADMIN";
-
 function buildParams(filters: DashboardFilters) {
   const params = new URLSearchParams();
+
   if (filters.semesterId) params.set("semesterId", filters.semesterId);
   if (filters.teacherId) params.set("teacherId", filters.teacherId);
   if (filters.subjectId) params.set("subjectId", filters.subjectId);
   if (filters.limit) params.set("limit", String(filters.limit));
+
   return params.toString();
 }
 
-export function useDashboard(role: Role) {
-  const isAdmin = role === "ADMIN";
-
-  // Filtros solo relevantes para admin
+export function useDashboard(isAdmin: boolean) {
   const [filters, setFilters] = useState<DashboardFilters>({});
 
   const handleSemesterFilter = useCallback((value: string) => {
@@ -50,62 +47,76 @@ export function useDashboard(role: Role) {
     }));
   }, []);
 
-  const resetFilters = useCallback(() => setFilters({}), []);
+  const resetFilters = useCallback(() => {
+    setFilters({});
+  }, []);
 
-  // ── Queries ───────────────────────────────────────────────────
-
+  // Overview
   const overviewQuery = useQuery<DashboardOverview>({
-    queryKey: ["dashboard", "overview", role, filters],
+    queryKey: ["dashboard", "overview", isAdmin, filters],
     queryFn: async () => {
       const path = isAdmin
         ? `/dashboard/admin/overview?${buildParams(filters)}`
-        : `/dashboard/teacher/overview`;
+        : "/dashboard/teacher/overview";
+
       const { data } = await apiClient.get<DashboardOverview>(path);
+
       return data;
     },
   });
 
+  // Asistencia por grupo
   const attendanceQuery = useQuery<GroupAttendance[]>({
-    queryKey: ["dashboard", "attendance", role, filters],
+    queryKey: ["dashboard", "attendance", isAdmin, filters],
     queryFn: async () => {
       const path = isAdmin
         ? `/dashboard/admin/attendance?${buildParams(filters)}`
-        : `/dashboard/teacher/attendance`;
+        : "/dashboard/teacher/attendance";
+
       const { data } = await apiClient.get<GroupAttendance[]>(path);
+
       return data;
     },
   });
 
+  // Distribución de asistencia
   const distributionQuery = useQuery<AttendanceDistribution[]>({
-    queryKey: ["dashboard", "distribution", role, filters],
+    queryKey: ["dashboard", "distribution", isAdmin, filters],
     queryFn: async () => {
       const path = isAdmin
         ? `/dashboard/admin/distribution?${buildParams(filters)}`
-        : `/dashboard/teacher/distribution`;
+        : "/dashboard/teacher/distribution";
+
       const { data } = await apiClient.get<AttendanceDistribution[]>(path);
+
       return data;
     },
   });
 
-  // Solo admin
+  // Ranking (admin -> materias, docente -> grupos)
   const subjectsRankingQuery = useQuery<SubjectRanking[]>({
-    queryKey: ["dashboard", "subjects-ranking", filters],
+    queryKey: ["dashboard", "ranking", isAdmin, filters],
     queryFn: async () => {
-      const { data } = await apiClient.get<SubjectRanking[]>(
-        `/dashboard/admin/subjects-ranking?${buildParams(filters)}`,
-      );
+      const path = isAdmin
+        ? `/dashboard/admin/subjects-ranking?${buildParams(filters)}`
+        : "/dashboard/teacher/groups-ranking";
+
+      const { data } = await apiClient.get<SubjectRanking[]>(path);
+
       return data;
     },
-    enabled: isAdmin,
   });
 
+  // Estudiantes con más ausencias
   const studentsAbsencesQuery = useQuery<StudentAbsence[]>({
-    queryKey: ["dashboard", "students-absences", role, filters],
+    queryKey: ["dashboard", "students-absences", isAdmin, filters],
     queryFn: async () => {
       const path = isAdmin
         ? `/dashboard/admin/students-absences?${buildParams(filters)}`
-        : `/dashboard/teacher/students-absences`;
+        : "/dashboard/teacher/students-absences";
+
       const { data } = await apiClient.get<StudentAbsence[]>(path);
+
       return data;
     },
   });
@@ -114,22 +125,19 @@ export function useDashboard(role: Role) {
     overviewQuery.isLoading ||
     attendanceQuery.isLoading ||
     distributionQuery.isLoading ||
+    subjectsRankingQuery.isLoading ||
     studentsAbsencesQuery.isLoading;
 
   return useMemo(
     () => ({
-      // datos
       overview: overviewQuery.data,
       attendance: attendanceQuery.data ?? [],
       distribution: distributionQuery.data ?? [],
       subjectsRanking: subjectsRankingQuery.data ?? [],
       studentsAbsences: studentsAbsencesQuery.data ?? [],
 
-      // estado
       isLoading,
-      isAdmin,
 
-      // filtros (solo admin los usa)
       filters,
       handleSemesterFilter,
       handleTeacherFilter,
@@ -143,7 +151,6 @@ export function useDashboard(role: Role) {
       subjectsRankingQuery.data,
       studentsAbsencesQuery.data,
       isLoading,
-      isAdmin,
       filters,
       handleSemesterFilter,
       handleTeacherFilter,
