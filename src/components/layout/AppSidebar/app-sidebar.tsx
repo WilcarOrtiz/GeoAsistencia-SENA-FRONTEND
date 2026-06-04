@@ -25,7 +25,7 @@ export function AppSidebar({
           <div className="relative h-[100px] w-[100px]">
             <Image
               src="/assets/logotipo.png"
-              alt="EduPin logo"
+              alt="GeoAsistencia logo"
               fill
               sizes="100px"
               className="object-contain"

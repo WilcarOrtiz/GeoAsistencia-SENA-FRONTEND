@@ -101,7 +101,7 @@ const LoginForm = ({ className, ...props }: React.ComponentProps<"form">) => {
           </Button>
         </F.Field>
 
-        <F.FieldSeparator>EduPin</F.FieldSeparator>
+        <F.FieldSeparator>GeoAsistencia</F.FieldSeparator>
 
         <F.Field>
           <F.FieldDescription className="text-small px-6 text-center">
