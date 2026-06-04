@@ -153,6 +153,7 @@ src/
 └── proxy.ts                    # Configuración del proxy de Supabase
 ```
 
+
 <h2>📱 Capturas de pantalla</h2>
 
 <p align="center">
@@ -340,13 +341,13 @@ http://localhost:3001/api/doc
 
 ### Endpoints consumidos
 
-#### 🔑 Autenticación
+####  Autenticación
 | Método | Endpoint | Descripción |
 |---|---|---|
 | `GET` | `/user/me` | Perfil completo: datos, roles, permisos y menú |
 | `GET` | `/user/is-active?email=` | Verifica si el usuario está activo |
 
-#### 👥 Usuarios
+####  Usuarios
 | Método | Endpoint | Descripción |
 |---|---|---|
 | `POST` | `/user` | Registrar usuario individual |
@@ -356,7 +357,7 @@ http://localhost:3001/api/doc
 | `POST` | `/user/bulk/import` | Carga masiva desde Excel |
 | `GET` | `/user/bulk/template` | Descargar plantilla Excel |
 
-#### 📚 Académico
+####  Académico
 | Método | Endpoint | Descripción |
 |---|---|---|
 | `POST` | `/semesters` | Crear semestre académico |
@@ -369,7 +370,7 @@ http://localhost:3001/api/doc
 | `GET` | `/subjects/all` | Listar asignaturas para selects |
 | `POST` | `/subjects/bulk/import` | Carga masiva desde Excel |
 
-#### 🗂️ Grupos de clase
+####  Grupos de clase
 | Método | Endpoint | Descripción |
 |---|---|---|
 | `POST` | `/class-groups` | Crear grupo de clase |
@@ -380,7 +381,7 @@ http://localhost:3001/api/doc
 | `POST` | `/class-days` | Agregar días/horarios al grupo |
 | `PATCH` | `/class-days/:id` | Actualizar horario |
 
-#### 📝 Matrículas
+####  Matrículas
 | Método | Endpoint | Descripción |
 |---|---|---|
 | `GET` | `/enrollment/:groupId` | Estudiantes del grupo con % asistencia |
@@ -389,21 +390,21 @@ http://localhost:3001/api/doc
 | `POST` | `/enrollment/bulk/import/:groupId` | Matrícula masiva desde Excel |
 | `GET` | `/enrollment/bulk/template` | Descargar plantilla Excel de matrícula |
 
-#### 📊 Sesiones y Asistencia
+#### Sesiones y Asistencia
 | Método | Endpoint | Descripción |
 |---|---|---|
 | `GET` | `/class-sessions/group/:groupId` | Historial de sesiones del grupo |
 | `GET` | `/class-sessions/:id/attendances` | Asistencias detalladas de una sesión |
 | `PATCH` | `/class-sessions/:id/close` | Cerrar sesión manualmente |
 
-#### 🔐 Roles y Permisos
+####  Roles y Permisos
 | Método | Endpoint | Descripción |
 |---|---|---|
 | `GET` | `/role` | Listar roles disponibles |
 | `PATCH` | `/roles/:id/permissions` | Actualizar permisos de un rol |
 | `GET` | `/permissions` | Listar permisos del sistema |
 
-#### 📈 Dashboard
+####  Dashboard
 | Método | Endpoint | Descripción |
 |---|---|---|
 | `GET` | `/dashboard/admin/overview` | Resumen general (admin) |
@@ -417,7 +418,7 @@ http://localhost:3001/api/doc
 | `GET` | `/dashboard/teacher/groups-ranking` | Ranking de grupos (docente) |
 | `GET` | `/dashboard/teacher/students-absences` | Estudiantes con más ausencias (docente) |
 
-#### 🔎 Listados auxiliares (para selects)
+####  Listados auxiliares (para selects)
 | Método | Endpoint | Descripción |
 |---|---|---|
 | `GET` | `/teacher/all-active` | Docentes activos |
