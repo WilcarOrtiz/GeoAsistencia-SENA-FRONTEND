@@ -1,4 +1,3 @@
-// features/dashboard/components/DashboardFilters.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -7,14 +6,13 @@ import {
   GenericSelect,
   semestersToOptions,
   subjectsToOptions,
+  teachersToOptions,
 } from "@/components/shared/select";
 import { useSemesters, useSubject, useTeacher } from "@/hooks/ApiList";
-
-// Necesitas agregar teachersToOptions en tu shared/select
-// similar a semestersToOptions y subjectsToOptions
-import { teachersToOptions } from "@/components/shared/select";
+import { DashboardFilters as Filters } from "@/features/dashboard/dashboard.types";
 
 interface Props {
+  filters: Filters;
   onSemesterChange: (v: string) => void;
   onTeacherChange: (v: string) => void;
   onSubjectChange: (v: string) => void;
@@ -22,6 +20,7 @@ interface Props {
 }
 
 export function DashboardFilters({
+  filters,
   onSemesterChange,
   onTeacherChange,
   onSubjectChange,
@@ -36,12 +35,12 @@ export function DashboardFilters({
       <div className="flex flex-col gap-1">
         <span className="text-xs text-muted-foreground">Semestre</span>
         <GenericSelect
+          value={filters.semesterId ?? "all"}
           options={[
             { label: "Todos", value: "all" },
             ...semestersToOptions(semesters),
           ]}
           loading={loadingSemesters}
-          defaultValue="all"
           onSelect={onSemesterChange}
           placeholder="Semestre"
         />
@@ -50,12 +49,12 @@ export function DashboardFilters({
       <div className="flex flex-col gap-1">
         <span className="text-xs text-muted-foreground">Docente</span>
         <GenericSelect
+          value={filters.teacherId ?? "all"}
           options={[
             { label: "Todos", value: "all" },
             ...teachersToOptions(teachers),
           ]}
           loading={loadingTeachers}
-          defaultValue="all"
           onSelect={onTeacherChange}
           placeholder="Docente"
         />
@@ -64,12 +63,12 @@ export function DashboardFilters({
       <div className="flex flex-col gap-1">
         <span className="text-xs text-muted-foreground">Asignatura</span>
         <GenericSelect
+          value={filters.subjectId ?? "all"}
           options={[
             { label: "Todos", value: "all" },
             ...subjectsToOptions(subjects),
           ]}
           loading={loadingSubjects}
-          defaultValue="all"
           onSelect={onSubjectChange}
           placeholder="Asignatura"
         />

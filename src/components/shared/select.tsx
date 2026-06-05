@@ -4,7 +4,6 @@ import * as React from "react";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-
 import {
   Popover,
   PopoverContent,
@@ -23,39 +22,28 @@ import {
   CommandList,
 } from "@/components/ui/command";
 
-// ── Tipos ────────────────────────────────────────────────────────────────────
-
 export interface SelectOption {
-  /** Valor que se retorna al padre (normalmente el id) */
   value: string;
-  /** Texto visible en la lista y en el trigger */
   label: string;
 }
 
 export interface GenericSelectProps {
-  /** Opciones a mostrar. Mapeá tus entidades antes de pasarlas. */
   options: SelectOption[];
-  /** Callback que recibe el id seleccionado */
   onSelect: (value: string) => void;
-  /** Id inicial (modo edición): el select mostrará el item correspondiente */
+  value?: string;
   defaultValue?: string;
-  /** Placeholder del trigger cuando no hay nada seleccionado */
   placeholder?: string;
-  /** Placeholder del input de búsqueda */
   searchPlaceholder?: string;
-  /** Mensaje cuando no hay coincidencias */
   emptyMessage?: string;
-  /** Estado de carga (mientras hacés fetch) */
   loading?: boolean;
-  /** Deshabilitar el componente */
   disabled?: boolean;
-  /** Clases extra para el botón trigger */
   className?: string;
 }
 
 export function GenericSelect({
   options,
   onSelect,
+  value: controlledValue,
   defaultValue,
   placeholder = "Seleccioná una opción…",
   searchPlaceholder = "Buscar…",
@@ -64,13 +52,20 @@ export function GenericSelect({
   disabled = false,
   className,
 }: GenericSelectProps) {
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState<string>(defaultValue ?? "");
+  const isControlled = controlledValue !== undefined;
 
-  // Sincronizar si el defaultValue cambia (ej: el padre carga el dato async)
+  const [open, setOpen] = React.useState(false);
+  const [internalValue, setInternalValue] = React.useState<string>(
+    defaultValue ?? "",
+  );
+
+  const value = isControlled ? controlledValue : internalValue;
+
   React.useEffect(() => {
-    setValue(defaultValue ?? "");
-  }, [defaultValue]);
+    if (!isControlled) {
+      setInternalValue(defaultValue ?? "");
+    }
+  }, [defaultValue, isControlled]);
 
   const selectedLabel = React.useMemo(
     () => options.find((o) => o.value === value)?.label ?? "",
@@ -79,7 +74,9 @@ export function GenericSelect({
 
   function handleSelect(currentValue: string) {
     const next = currentValue === value ? "" : currentValue;
-    setValue(next);
+    if (!isControlled) {
+      setInternalValue(next);
+    }
     onSelect(next);
     setOpen(false);
   }
@@ -140,11 +137,6 @@ export function GenericSelect({
   );
 }
 
-// ── Helpers de mapeo ──────────────────────────────────────────────────────────
-
-/*
-export const semestersToOptions = (items: SemesterBasic[]): SelectOption[] =>
-  items.map((s) => ({ value: s.id, label: `${s.code} – ${s.name}` }));*/
 export const semestersToOptions = (items: SemesterBasic[]): SelectOption[] =>
   items.map((s) => ({ value: s.id, label: `${s.code}` }));
 

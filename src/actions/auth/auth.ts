@@ -12,7 +12,7 @@ export async function login(formData: { email: string; password: string }) {
   });
 
   if (error) return { success: false, message: error.message };
-  return { success: true, message: "Autenticaicon correcta" };
+  return { success: true, message: "Bienvenido" };
 }
 
 export async function sendRecoveryEmail(formData: { email: string }) {
