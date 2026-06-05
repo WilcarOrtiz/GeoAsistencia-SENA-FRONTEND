@@ -12,6 +12,7 @@ import { PERMISSIONS } from "@/constants/permissions";
 import { Can } from "@/components/shared/Can";
 import { usePermissions } from "@/hooks/usePermission";
 import { ROLES } from "@/features/roleAndPermission/role.constants";
+import { DashboardSkeleton } from "@/components/shared/DashboardSkeleton";
 
 export default function DashboardPage() {
   const { hasRole } = usePermissions();
@@ -28,6 +29,12 @@ export default function DashboardPage() {
     handleSubjectFilter,
     resetFilters,
   } = useDashboard(isAdmin);
+  if (isLoading)
+    return (
+      <Can permission={PERMISSIONS.VER_REPORTES}>
+        <DashboardSkeleton />
+      </Can>
+    );
 
   return (
     <Can permission={PERMISSIONS.VER_REPORTES}>
