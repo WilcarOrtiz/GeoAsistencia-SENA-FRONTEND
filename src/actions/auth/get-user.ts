@@ -5,16 +5,19 @@ import { UserProfile } from "@/types";
 
 export const isUserActive = async (email: string): Promise<boolean> => {
   try {
-    const response = await apiServer.get(`/user/is-active?email=${email}`);
+    const response = await apiServer.get<{ isActive: boolean }>(
+      `/user/is-active?email=${email}`,
+    );
+
+    console.log("backend response:", response.data);
 
     if (!response.ok || !response.data) {
       return false;
     }
 
-    return response.data === true;
+    return Boolean(response.data.isActive);
   } catch (error) {
     console.error("Error al validar si el usuario está activo:", error);
-
     return false;
   }
 };

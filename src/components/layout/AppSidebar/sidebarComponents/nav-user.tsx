@@ -1,22 +1,22 @@
 "use client";
 
+import { useState } from "react"; // ✅ agregar
 import { BadgeCheck, ChevronsUpDown, LogOut } from "lucide-react";
 import * as D from "@/components/ui/dropdown-menu";
 import * as S from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
 import { signOut } from "@/actions/auth/auth";
 import { UserAvatar } from "@/components/shared/UserAvatar";
+import { UpdatePasswordDialog } from "@/components/shared/UpdatePasswordDialog";
 
 export function NavUser({
   user,
 }: {
-  user: {
-    name: string;
-    email: string;
-  } | null;
+  user: { name: string; email: string } | null;
 }) {
   const router = useRouter();
   const { isMobile } = S.useSidebar();
+  const [updatePasswordOpen, setUpdatePasswordOpen] = useState(false); // ✅ aquí arriba
 
   if (!user) {
     return (
@@ -39,11 +39,15 @@ export function NavUser({
     router.push("/login");
   };
 
+  const handleUpdatePassword = () => {
+    // ✅ solo uno, sin router.push
+    setUpdatePasswordOpen(true);
+  };
+
   return (
     <S.SidebarMenu>
       <S.SidebarMenuItem>
         <D.DropdownMenu>
-          {/*Fijo*/}
           <D.DropdownMenuTrigger asChild>
             <S.SidebarMenuButton
               size="lg"
@@ -58,7 +62,6 @@ export function NavUser({
             </S.SidebarMenuButton>
           </D.DropdownMenuTrigger>
 
-          {/*Desplegable*/}
           <D.DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
@@ -77,20 +80,25 @@ export function NavUser({
 
             <D.DropdownMenuSeparator />
             <D.DropdownMenuGroup>
-              <D.DropdownMenuItem>
+              <D.DropdownMenuItem onClick={handleUpdatePassword}>
                 <BadgeCheck />
-                Perfil
+                Actualizar Contraseña
               </D.DropdownMenuItem>
             </D.DropdownMenuGroup>
 
             <D.DropdownMenuSeparator />
             <D.DropdownMenuItem onClick={handleLogout}>
               <LogOut />
-              Cerrar Sesion
+              Cerrar Sesión
             </D.DropdownMenuItem>
           </D.DropdownMenuContent>
         </D.DropdownMenu>
       </S.SidebarMenuItem>
+
+      <UpdatePasswordDialog
+        open={updatePasswordOpen}
+        onOpenChange={setUpdatePasswordOpen}
+      />
     </S.SidebarMenu>
   );
 }

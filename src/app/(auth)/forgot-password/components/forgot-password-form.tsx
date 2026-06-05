@@ -36,6 +36,8 @@ const ForgotPasswordForm = () => {
     try {
       const res = await isUserActive(values.email);
 
+      console.log("RESPUESTA AL ACTUALIZAR CONTRASENA", res); 
+
       if (!res) {
         toast.error("Usuario inactivo o no registrado");
         router.push("/error");
