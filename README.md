@@ -42,6 +42,19 @@ Toda la lógica de negocio reside en el backend REST `GeoAsistencia_BACKEND` (Ne
 | Iconos | Lucide React |
 
 ---
+## 🐳 Docker
+
+```bash
+# Construir imagen
+docker build -t geoasistencia-frontend .
+
+# Ejecutar contenedor
+docker run -d \
+  --name geoasistencia-frontend \
+  -p 3000:3000 \
+  --env-file .env \
+  geoasistencia-frontend
+```
 
 ## 🎯 Funcionalidades por rol
 

@@ -3,7 +3,7 @@ import axios from "axios";
 import { createApiHelpers } from "./helper";
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_NEST_API_URL,
+  baseURL: process.env.NEST_API_URL || process.env.NEXT_PUBLIC_NEST_API_URL,
 });
 
 api.interceptors.request.use(async (config) => {
