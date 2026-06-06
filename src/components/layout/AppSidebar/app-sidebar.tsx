@@ -24,7 +24,7 @@ export function AppSidebar({
         <div className="flex items-center justify-center pt-3">
           <div className="relative h-[100px] w-[100px]">
             <Image
-              src="/assets/logotipo.png"
+              src="/assets/logotipoGeoAsistencia.png"
               alt="GeoAsistencia logo"
               fill
               sizes="100px"
