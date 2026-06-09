@@ -40,7 +40,7 @@ export function TransferModal({
   const { data: groups, loading } =
     useClassGroupTransferOptions(currentGroupId);
 
-  const availableGroups = groups.filter((g) => g.id !== currentGroupId);
+  const availableGroups = (groups ?? []).filter((g) => g.id !== currentGroupId);
 
   const handleConfirm = async () => {
     if (!targetGroupId) return;
@@ -62,18 +62,25 @@ export function TransferModal({
           estudiante(s) al grupo seleccionado.
         </p>
 
-        <Select value={targetGroupId} onValueChange={setTargetGroupId}>
-          <SelectTrigger>
-            <SelectValue placeholder="Selecciona grupo destino" />
-          </SelectTrigger>
-          <SelectContent>
-            {availableGroups.map((g) => (
-              <SelectItem key={g.id} value={g.id}>
-                {g.name} ({g.code})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {availableGroups.length === 0 ? (
+          <div className="text-sm text-muted-foreground py-2">
+            No hay grupos disponibles para transferencia
+          </div>
+        ) : (
+          <Select value={targetGroupId} onValueChange={setTargetGroupId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecciona grupo destino" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {availableGroups.map((g) => (
+                <SelectItem key={g.id} value={g.id}>
+                  {g.name} ({g.code})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
@@ -81,7 +88,9 @@ export function TransferModal({
           </Button>
           <Button
             onClick={handleConfirm}
-            disabled={!targetGroupId || isLoading}
+            disabled={
+              !targetGroupId || isLoading || availableGroups.length === 0
+            }
           >
             {isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             Confirmar

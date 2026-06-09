@@ -34,6 +34,7 @@ export function useEnrollments(groupId?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["enrollment", groupId] });
       queryClient.invalidateQueries({ queryKey: ["class-group", groupId] });
+      queryClient.invalidateQueries({ queryKey: ["academic-groups"] });
       toast.success("Estudiante(s) dados de baja correctamente");
     },
     onError: () => toast.error("Error al dar de baja"),
@@ -61,6 +62,7 @@ export function useEnrollments(groupId?: string) {
 
         queryClient.invalidateQueries({ queryKey: ["enrollment", toGroupId] });
         queryClient.invalidateQueries({ queryKey: ["class-group", toGroupId] });
+        queryClient.invalidateQueries({ queryKey: ["academic-groups"] });
 
         toast.success("Estudiantes transferidos correctamente");
       },
