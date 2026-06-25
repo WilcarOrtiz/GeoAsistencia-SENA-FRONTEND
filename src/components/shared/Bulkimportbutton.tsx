@@ -76,7 +76,7 @@ export function BulkImportButton({
           },
         );
       } else {
-        toast.success(`${created} registro(s) importado(s) correctamente.`);
+        toast.success(`registro(s) importado(s) correctamente.`);
       }
     },
     onError: (error) => {
